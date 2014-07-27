@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/head_main"
+    android:layout_width="match_parent"
+    android:layout_height="44dip"
+    android:background="#FFCC8899"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/head_viewpage_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/head_viewpage_left_tv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1.0"
+            android:gravity="center"
+            android:text="公开"
+            android:textColor="#000000"
+            android:textSize="20.0dip" />
+
+        <TextView
+            android:id="@+id/head_viewpage_right_tv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1.0"
+            android:gravity="center"
+            android:text="个人"
+            android:textColor="#000000"
+            android:textSize="20.0dip" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/head_viewpage_iamge"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:scaleType="matrix"
+        android:src="@drawable/viewpager_point" />
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_weight="0"
+        android:background="#000000" />
+
+</LinearLayout>

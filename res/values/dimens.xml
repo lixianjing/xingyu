@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="slidingmenu_offset">50.0dip</dimen>
+    <dimen name="shadow_width">15.0dip</dimen>
+    
+     <dimen name="listview_footer_height">44.0dip</dimen>
+</resources>
