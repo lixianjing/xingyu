@@ -20,7 +20,7 @@ public class DrawerView implements OnClickListener {
 
     private final Activity activity;
     private SlidingMenu localSlidingMenu;
-    private Button leftBtn1, leftBtn2, leftBtn3, rightBtn1;
+    private Button leftBtn1, leftBtn2, leftBtn3, rightBtn1, rightBtn2;
 
     public DrawerView(Activity activity) {
         this.activity = activity;
@@ -29,8 +29,8 @@ public class DrawerView implements OnClickListener {
     public SlidingMenu initSlidingMenu() {
         localSlidingMenu = new SlidingMenu(activity);
         localSlidingMenu.setMode(SlidingMenu.LEFT_RIGHT);// 设置左右滑菜单
-        localSlidingMenu.setTouchModeAbove(SlidingMenu.SLIDING_WINDOW);// 设置要使菜单滑动，触碰屏幕的范围
-        // localSlidingMenu.setTouchModeBehind(SlidingMenu.SLIDING_CONTENT);//设置了这个会获取不到菜单里面的焦点，所以先注释掉
+        localSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);// 设置要使菜单滑动，触碰屏幕的范围
+        localSlidingMenu.setTouchModeBehind(SlidingMenu.TOUCHMODE_MARGIN);// 设置了这个会获取不到菜单里面的焦点，所以先注释掉
         localSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);// 设置阴影图片的宽度
         localSlidingMenu.setShadowDrawable(R.drawable.shadow);// 设置阴影图片
         localSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);// SlidingMenu划出时主页面显示的剩余宽度
@@ -65,11 +65,13 @@ public class DrawerView implements OnClickListener {
         leftBtn2 = (Button) localSlidingMenu.findViewById(R.id.left_btn2);
         leftBtn3 = (Button) localSlidingMenu.findViewById(R.id.left_btn3);
         rightBtn1 = (Button) localSlidingMenu.findViewById(R.id.right_btn1);
+        rightBtn2 = (Button) localSlidingMenu.findViewById(R.id.right_btn2);
 
         leftBtn1.setOnClickListener(this);
         leftBtn2.setOnClickListener(this);
         leftBtn3.setOnClickListener(this);
         rightBtn1.setOnClickListener(this);
+        rightBtn2.setOnClickListener(this);
 
     }
 
@@ -78,8 +80,7 @@ public class DrawerView implements OnClickListener {
         switch (v.getId()) {
             case R.id.left_btn1:
                 Log.e("lmf", ">>>>>>>>>>left_btn1>>>>>>>>>>>");
-                activity.startActivity(new Intent(activity, TestActivity.class));
-                activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                localSlidingMenu.showContent(true);
                 break;
             case R.id.left_btn2:
                 Log.e("lmf", ">>>>>>>>>>left_btn2>>>>>>>>>>>");
@@ -93,6 +94,13 @@ public class DrawerView implements OnClickListener {
                 break;
             case R.id.right_btn1:
                 Log.e("lmf", ">>>>>>>>>>right_btn1>>>>>>>>>>>");
+                activity.startActivity(new Intent(activity, TestActivity.class));
+                activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                break;
+            case R.id.right_btn2:
+                Log.e("lmf", ">>>>>>>>>>right_btn1>>>>>>>>>>>");
+                activity.startActivity(new Intent(activity, TestActivity.class));
+                activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 break;
 
             default:
