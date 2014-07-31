@@ -12,17 +12,17 @@
     </com.xian.xingyu.view.CommonHeadView>
 
     <LinearLayout
-        android:id="@+id/add_ll"
+        android:id="@+id/test_ll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/test_head"
+        android:layout_below="@id/add_head"
         android:background="#FF112211"
         android:orientation="horizontal" >
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="意见" />
+            android:text="添加应用" />
     </LinearLayout>
 
 </RelativeLayout>
