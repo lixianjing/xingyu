@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.LinearLayout;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnClosedListener;
@@ -21,6 +22,7 @@ public class DrawerView implements OnClickListener {
     private final Activity activity;
     private SlidingMenu localSlidingMenu;
     private Button leftBtn1, leftBtn2, leftBtn3, rightBtn1, rightBtn2;
+    private LinearLayout leftLoginLl;
 
     public DrawerView(Activity activity) {
         this.activity = activity;
@@ -67,17 +69,26 @@ public class DrawerView implements OnClickListener {
         rightBtn1 = (Button) localSlidingMenu.findViewById(R.id.right_btn1);
         rightBtn2 = (Button) localSlidingMenu.findViewById(R.id.right_btn2);
 
+        leftLoginLl = (LinearLayout) localSlidingMenu.findViewById(R.id.left_login);
+
         leftBtn1.setOnClickListener(this);
         leftBtn2.setOnClickListener(this);
         leftBtn3.setOnClickListener(this);
         rightBtn1.setOnClickListener(this);
         rightBtn2.setOnClickListener(this);
+        leftLoginLl.setOnClickListener(this);
 
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.left_login:
+                Log.e("lmf", ">>>>>>>>>>left_login>>>>>>>>>>>");
+                LoginDialog dialog = new LoginDialog(activity, R.style.MyDialog);
+
+                dialog.show();
+                break;
             case R.id.left_btn1:
                 Log.e("lmf", ">>>>>>>>>>left_btn1>>>>>>>>>>>");
                 localSlidingMenu.showContent(true);
