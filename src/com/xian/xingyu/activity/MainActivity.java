@@ -2,6 +2,7 @@
 package com.xian.xingyu.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.Bundle;
@@ -180,6 +181,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                 if (mSlidingMenu.isMenuShowing()) {
                     mSlidingMenu.showContent();
                 } else {
+
+                    Intent intent = new Intent(this, AddActivity.class);
+                    mContext.startActivity(intent);
+                    this.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                     Log.e("lmf", ">>>>>>>>>>>>>>edit>>>>>>>>>");
                 }
                 break;

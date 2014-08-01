@@ -42,7 +42,10 @@
             android:name=".activity.LoginActivity"
             android:screenOrientation="portrait" >
         </activity>
-
+        <activity
+            android:name=".activity.AddActivity"
+            android:screenOrientation="portrait" >
+        </activity>
         <!-- qq api -->
         <activity
             android:name="com.tencent.tauth.AuthActivity"
