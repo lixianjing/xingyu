@@ -3,6 +3,7 @@ package com.xian.xingyu.view;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -110,8 +111,15 @@ public class DrawerView implements OnClickListener {
                 break;
             case R.id.right_btn2:
                 Log.e("lmf", ">>>>>>>>>>right_btn1>>>>>>>>>>>");
-                activity.startActivity(new Intent(activity, TestActivity.class));
-                activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                // activity.startActivity(new Intent(activity, TestActivity.class));
+                // activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.setData(Uri.parse("http://www.baidu.com"));
+                activity.startActivity(intent);
+
+
                 break;
 
             default:

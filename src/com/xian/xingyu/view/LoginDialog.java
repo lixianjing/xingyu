@@ -1,22 +1,24 @@
 package com.xian.xingyu.view;
 
+import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import com.xian.xingyu.R;
+import com.xian.xingyu.login.QQAccountManager;
 
 public class LoginDialog extends Dialog implements android.view.View.OnClickListener {
 
-    private Context mContext;
+    private Activity mActivity;
     private Button mQqBtn, mWeiboBtn;
 
 
-    public LoginDialog(Context context, int theme) {
-        super(context, theme);
-        this.mContext = context;
+    public LoginDialog(Activity activity, int theme) {
+        super(activity, theme);
+        this.mActivity = activity;
     }
 
     @Override
@@ -36,7 +38,8 @@ public class LoginDialog extends Dialog implements android.view.View.OnClickList
         // TODO Auto-generated method stub
         switch (arg0.getId()) {
             case R.id.login_qq_btn:
-
+                Log.e("lmf", ">>>>>>>>>>>>>>>login_qq_btn>>>>>>>>");
+                QQAccountManager.getInstance(mActivity.getApplicationContext()).login(mActivity);
                 break;
             case R.id.login_weibo_btn:
 

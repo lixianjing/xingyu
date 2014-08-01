@@ -2,6 +2,7 @@ package com.xian.xingyu.login;
 
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
@@ -54,20 +55,12 @@ public class QQAccountManager implements IAccountManager {
     }
 
     @Override
-    public void login() {
+    public void login(Activity activity) {
         // TODO Auto-generated method stub
-        IUiListener listener = new BaseUiListener() {
-            @Override
-            protected void doComplete(JSONObject values) {
-                // updateUserInfo();
-                // updateLoginButton();
-            }
-        };
-        // mQQAuth.login(this, "all", listener);
 
-        // mTencent.login(mContext, APP_ID, new BaseUiListener() {
-        //
-        // });
+        mTencent.login(activity, APP_ID, new BaseUiListener() {
+
+        });
     }
 
     @Override
