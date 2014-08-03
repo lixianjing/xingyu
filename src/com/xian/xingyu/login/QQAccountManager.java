@@ -1,23 +1,27 @@
-package com.xian.xingyu.login;
 
-import org.json.JSONObject;
+package com.xian.xingyu.login;
 
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
+import com.tencent.connect.UserInfo;
 import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.Tencent;
 import com.tencent.tauth.UiError;
+import com.xian.xingyu.activity.MainActivity;
+import com.xian.xingyu.util.BaseUtil;
 
-
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class QQAccountManager implements IAccountManager {
 
     private static final String APP_ID = "222222";
+    private final Context mContext;
 
-    private Tencent mTencent;
-    private Context mContext;
+    private final Tencent mTencent;
+    private UserInfo mInfo;
 
     private static QQAccountManager instance;
 
@@ -40,9 +44,7 @@ public class QQAccountManager implements IAccountManager {
         this.mContext = context;
         mTencent = Tencent.createInstance(APP_ID, mContext);
 
-
     }
-
 
     @Override
     public boolean isLogin() {
@@ -55,10 +57,34 @@ public class QQAccountManager implements IAccountManager {
     }
 
     @Override
-    public void login(Activity activity) {
+    public void login(final Activity activity) {
         // TODO Auto-generated method stub
 
-        mTencent.login(activity, APP_ID, new BaseUiListener() {
+        mTencent.login(activity, APP_ID, new IUiListener() {
+
+            @Override
+            public void onCancel() {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void onComplete(Object arg0) {
+                // TODO Auto-generated method stub
+                Log.e("lmf", ">>>>>>>>>>>>onComplete>>>>>>>" + arg0);
+                if (activity instanceof MainActivity) {
+                    ((MainActivity) activity).updateLoginStatus(true);
+                }
+
+                getUserInfo();
+
+            }
+
+            @Override
+            public void onError(UiError arg0) {
+                // TODO Auto-generated method stub
+
+            }
 
         });
     }
@@ -69,30 +95,59 @@ public class QQAccountManager implements IAccountManager {
         mTencent.logout(mContext);
     }
 
+    public void getUserInfo() {
+        mInfo = new UserInfo(mContext, mTencent.getQQToken());
+        mInfo.getUserInfo(new IUiListener() {
 
-    private class BaseUiListener implements IUiListener {
+            @Override
+            public void onCancel() {
+                // TODO Auto-generated method stub
 
-        @Override
-        public void onComplete(Object response) {
-            Log.e("lmf", ">>>onComplete>>>登录成功>>>>>>>>");
-            doComplete((JSONObject) response);
-        }
+            }
 
-        protected void doComplete(JSONObject values) {
+            @Override
+            public void onComplete(Object arg0) {
+                // TODO Auto-generated method stub
+                Log.e("lmf", ">>getUserInfo>>>>>arg0>>>>" + arg0);
+                final JSONObject json = (JSONObject) arg0;
+                new Thread(new Runnable() {
 
-        }
+                    @Override
+                    public void run() {
+                        // TODO Auto-generated method stub
+                        try {
+                            BaseUtil.saveFileToData(mContext, "figureurl_qq_1",
+                                    json.getString("figureurl_qq_1"));
+                            BaseUtil.saveFileToData(mContext, "figureurl_qq_2",
+                                    json.getString("figureurl_qq_2"));
+                            BaseUtil.saveFileToData(mContext, "figureurl_1",
+                                    json.getString("figureurl_1"));
+                            BaseUtil.saveFileToData(mContext, "figureurl_2",
+                                    json.getString("figureurl_2"));
+                            BaseUtil.saveFileToData(mContext, "figureurl",
+                                    json.getString("figureurl"));
+                        } catch (JSONException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
 
-        @Override
-        public void onError(UiError e) {
-            Log.e("lmf", ">>>onError>>>>>>>>");
-        }
+            }
 
-        @Override
-        public void onCancel() {
-            Log.e("lmf", ">>>onCancel>>>>>>>>");
-        }
+            @Override
+            public void onError(UiError arg0) {
+                // TODO Auto-generated method stub
+
+            }
+
+        });
     }
 
-
+    public void load(String openid, String accessToken, long expiresIn) {
+        // TODO Auto-generated method stub
+        mTencent.setOpenId(openid);
+        mTencent.setAccessToken(accessToken, String.valueOf(expiresIn));
+    }
 
 }

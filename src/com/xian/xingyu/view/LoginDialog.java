@@ -1,3 +1,4 @@
+
 package com.xian.xingyu.view;
 
 import android.app.Activity;
@@ -12,12 +13,11 @@ import com.xian.xingyu.login.QQAccountManager;
 
 public class LoginDialog extends Dialog implements android.view.View.OnClickListener {
 
-    private Activity mActivity;
+    private final Activity mActivity;
     private Button mQqBtn, mWeiboBtn;
 
-
-    public LoginDialog(Activity activity, int theme) {
-        super(activity, theme);
+    public LoginDialog(Activity activity) {
+        super(activity, R.style.MyDialog);
         this.mActivity = activity;
     }
 
@@ -40,6 +40,7 @@ public class LoginDialog extends Dialog implements android.view.View.OnClickList
             case R.id.login_qq_btn:
                 Log.e("lmf", ">>>>>>>>>>>>>>>login_qq_btn>>>>>>>>");
                 QQAccountManager.getInstance(mActivity.getApplicationContext()).login(mActivity);
+                this.dismiss();
                 break;
             case R.id.login_weibo_btn:
 

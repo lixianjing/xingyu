@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -26,8 +27,12 @@ import android.widget.Toast;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.xian.xingyu.R;
+import com.xian.xingyu.bean.Account;
+import com.xian.xingyu.bean.Personal;
+import com.xian.xingyu.db.DBManager;
 import com.xian.xingyu.fragment.PrivateFragment;
 import com.xian.xingyu.fragment.PublicFragment;
+import com.xian.xingyu.login.QQAccountManager;
 import com.xian.xingyu.view.DrawerView;
 
 import java.util.ArrayList;
@@ -46,7 +51,11 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     private ViewPager mViewPager;
     private ImageView mPointIv;
 
+    private DrawerView drawerView;
+
     private SlidingMenu mSlidingMenu;
+
+    private DBManager mDBManager;
 
     int moveX; // 导航下面横线偏移宽度
     int width; // 导航下面比较粗的线的宽度
@@ -58,9 +67,14 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         mContext = this;
         mFragmentManager = getSupportFragmentManager();
         setContentView(R.layout.main);
+        mDBManager = DBManager.getInstance(mContext);
         initView();
         initSlidingMenu();
         initListener();
+
+        updateLoginStatus(false);
+
+        initData();
 
     }
 
@@ -68,7 +82,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     protected void onStart() {
         // TODO Auto-generated method stub
         super.onStart();
-        Log.e("lmf", ">>>>>>>xxxxxxxxxx>>>>>>>>>>>>>>>");
+        Log.e("lmf", ">>>>>>>onStart>>>>>>>>>>>>>>>");
         mSlidingMenu.showContent(false);
     }
 
@@ -76,6 +90,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     protected void onStop() {
         // TODO Auto-generated method stub
         super.onStop();
+        Log.e("lmf", ">>>>>>>onStop>>>>>>>>>>>>>>>");
     }
 
     private void initView() {
@@ -121,8 +136,24 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         mTabMiddleRl.setOnClickListener(this);
     }
 
+    private void initData() {
+        Account account = mDBManager.getCurrentAccount();
+        if (account != null) {
+            Personal personal = mDBManager.getPersonalByAccountId(account.getId());
+            if (personal == null) {
+                QQAccountManager.getInstance(this.getApplicationContext()).logout();
+            } else {
+                QQAccountManager.getInstance(this.getApplicationContext()).load(account.getKey(),
+                        account.getToken(),
+                        (account.getAuthTime() - System.currentTimeMillis() / 1000));
+            }
+        }
+
+    }
+
     private void initSlidingMenu() {
-        mSlidingMenu = new DrawerView(this).initSlidingMenu();
+        drawerView = new DrawerView(this);
+        mSlidingMenu = drawerView.initSlidingMenu();
     }
 
     private long mExitTime;
@@ -250,6 +281,42 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
             animation.setDuration(300); // 设置动画时间
             mPointIv.startAnimation(animation); // 启动动画
         }
+    }
+
+    public void updateLoginStatus(boolean bool) {
+        drawerView.updateLoginStatus(bool);
+    }
+
+    class LoginAsyncTask extends AsyncTask<Void, Void, Void> {
+        private final Context context;
+
+        LoginAsyncTask(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            // TODO Auto-generated method stub
+            Account account = mDBManager.getCurrentAccount();
+            if (account == null) {
+
+            } else {
+                // String openid = "1234567896ASDFGHJKLLIUYT";
+                // String access_token = "2C0884DC4B930010D852D8D504FC9F4D";
+                // String expires_in = "7776000"; // 实际值需要通过上面介绍的方法来计算
+                // mTencent = Tencent.createInstance(APP_ID);
+                // mTencent.setOpenId(openid);
+                // mTencent.setAccessToken(access_token, expires_in);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            // TODO Auto-generated method stub
+            super.onPostExecute(result);
+        }
+
     }
 
 }

@@ -8,12 +8,17 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnClosedListener;
 import com.xian.xingyu.R;
+import com.xian.xingyu.activity.PersonInfoActivity;
 import com.xian.xingyu.activity.TestActivity;
+import com.xian.xingyu.login.QQAccountManager;
 
 /**
  * 自定义SlidingMenu 测拉菜单类
@@ -23,7 +28,11 @@ public class DrawerView implements OnClickListener {
     private final Activity activity;
     private SlidingMenu localSlidingMenu;
     private Button leftBtn1, leftBtn2, leftBtn3, rightBtn1, rightBtn2;
-    private LinearLayout leftLoginLl;
+
+    private FrameLayout leftLoginFl;
+    private TextView leftLoginTv, leftLoginInfoTitleTv, leftLoginInfoContentTv;
+    private LinearLayout leftLoginInfoLl;
+    private ImageView leftLoginInfoIconIv;
 
     public DrawerView(Activity activity) {
         this.activity = activity;
@@ -70,25 +79,43 @@ public class DrawerView implements OnClickListener {
         rightBtn1 = (Button) localSlidingMenu.findViewById(R.id.right_btn1);
         rightBtn2 = (Button) localSlidingMenu.findViewById(R.id.right_btn2);
 
-        leftLoginLl = (LinearLayout) localSlidingMenu.findViewById(R.id.left_login);
+        leftLoginFl = (FrameLayout) localSlidingMenu.findViewById(R.id.left_login_fl);
+        leftLoginTv = (TextView) localSlidingMenu.findViewById(R.id.left_login_tv);
+        leftLoginInfoLl = (LinearLayout) localSlidingMenu.findViewById(R.id.left_login_info_ll);
+
+        leftLoginInfoTitleTv = (TextView) localSlidingMenu
+                .findViewById(R.id.left_login_info_title_tv);
+        leftLoginInfoContentTv = (TextView) localSlidingMenu
+                .findViewById(R.id.left_login_info_content_tv);
+        leftLoginInfoIconIv = (ImageView) localSlidingMenu
+                .findViewById(R.id.left_login_info_icon_iv);
 
         leftBtn1.setOnClickListener(this);
         leftBtn2.setOnClickListener(this);
         leftBtn3.setOnClickListener(this);
         rightBtn1.setOnClickListener(this);
         rightBtn2.setOnClickListener(this);
-        leftLoginLl.setOnClickListener(this);
+        leftLoginFl.setOnClickListener(this);
 
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.left_login:
-                Log.e("lmf", ">>>>>>>>>>left_login>>>>>>>>>>>");
-                LoginDialog dialog = new LoginDialog(activity, R.style.MyDialog);
+            case R.id.left_login_fl:
 
-                dialog.show();
+                if (QQAccountManager.getInstance(activity.getApplicationContext()).isLogin()) {
+
+                    Log.e("lmf", ">>>>>>>>>>login>>>>>>>>>>>");
+                    activity.startActivity(new Intent(activity, PersonInfoActivity.class));
+                    activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                } else {
+                    Log.e("lmf", ">>>>>>>>>>not login>>>>>>>>>>>");
+                    LoginDialog dialog = new LoginDialog(activity);
+
+                    dialog.show();
+                }
+
                 break;
             case R.id.left_btn1:
                 Log.e("lmf", ">>>>>>>>>>left_btn1>>>>>>>>>>>");
@@ -111,19 +138,30 @@ public class DrawerView implements OnClickListener {
                 break;
             case R.id.right_btn2:
                 Log.e("lmf", ">>>>>>>>>>right_btn1>>>>>>>>>>>");
-                // activity.startActivity(new Intent(activity, TestActivity.class));
-                // activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                // activity.startActivity(new Intent(activity,
+                // TestActivity.class));
+                // activity.overridePendingTransition(R.anim.slide_in_right,
+                // R.anim.slide_out_left);
 
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.setData(Uri.parse("http://www.baidu.com"));
                 activity.startActivity(intent);
 
-
                 break;
 
             default:
                 break;
+        }
+    }
+
+    public void updateLoginStatus(boolean bool) {
+        if (bool) {
+            leftLoginInfoLl.setVisibility(View.VISIBLE);
+            leftLoginTv.setVisibility(View.GONE);
+        } else {
+            leftLoginInfoLl.setVisibility(View.GONE);
+            leftLoginTv.setVisibility(View.VISIBLE);
         }
     }
 
