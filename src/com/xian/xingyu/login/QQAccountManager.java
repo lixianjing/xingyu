@@ -1,8 +1,11 @@
-
 package com.xian.xingyu.login;
 
-import android.app.Activity;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences.Editor;
 import android.util.Log;
 
 import com.tencent.connect.UserInfo;
@@ -10,16 +13,20 @@ import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.Tencent;
 import com.tencent.tauth.UiError;
 import com.xian.xingyu.activity.MainActivity;
+import com.xian.xingyu.bean.Personal;
+import com.xian.xingyu.db.DBInfo;
+import com.xian.xingyu.db.DBManager;
 import com.xian.xingyu.util.BaseUtil;
+import com.xian.xingyu.util.Configs;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-public class QQAccountManager implements IAccountManager {
+public class QQAccountManager {
 
     private static final String APP_ID = "222222";
     private final Context mContext;
 
+
+    private DBManager mDBManager;
+    private Configs mConfigs;
     private final Tencent mTencent;
     private UserInfo mInfo;
 
@@ -43,10 +50,11 @@ public class QQAccountManager implements IAccountManager {
         super();
         this.mContext = context;
         mTencent = Tencent.createInstance(APP_ID, mContext);
+        mDBManager = DBManager.getInstance(context.getApplicationContext());
+        mConfigs = Configs.getInstance(context.getApplicationContext());
 
     }
 
-    @Override
     public boolean isLogin() {
         // TODO Auto-generated method stub
 
@@ -56,8 +64,7 @@ public class QQAccountManager implements IAccountManager {
         return false;
     }
 
-    @Override
-    public void login(final Activity activity) {
+    public void login(final MainActivity activity) {
         // TODO Auto-generated method stub
 
         mTencent.login(activity, APP_ID, new IUiListener() {
@@ -71,12 +78,14 @@ public class QQAccountManager implements IAccountManager {
             @Override
             public void onComplete(Object arg0) {
                 // TODO Auto-generated method stub
-                Log.e("lmf", ">>>>>>>>>>>>onComplete>>>>>>>" + arg0);
-                if (activity instanceof MainActivity) {
-                    ((MainActivity) activity).updateLoginStatus(true);
-                }
 
-                getUserInfo();
+
+
+                Log.e("lmf", ">>>>>>>>>>>>onComplete>>>>>>>" + arg0);
+
+                Log.e("lmf", ">>>>>>>>onComplete>>>>>>>>>>>>" + System.currentTimeMillis());
+                getUserInfo(activity, arg0);
+                Log.e("lmf", ">>>>>>>>onComplete>>>>>>>>>>>>" + System.currentTimeMillis());
 
             }
 
@@ -89,56 +98,109 @@ public class QQAccountManager implements IAccountManager {
         });
     }
 
-    @Override
     public void logout() {
         // TODO Auto-generated method stub
         mTencent.logout(mContext);
     }
 
-    public void getUserInfo() {
+    private void getUserInfo(final MainActivity activity, final Object accountJson) {
+
         mInfo = new UserInfo(mContext, mTencent.getQQToken());
         mInfo.getUserInfo(new IUiListener() {
 
             @Override
             public void onCancel() {
                 // TODO Auto-generated method stub
-
+                mTencent.logout(mContext);
             }
 
             @Override
             public void onComplete(Object arg0) {
-                // TODO Auto-generated method stub
-                Log.e("lmf", ">>getUserInfo>>>>>arg0>>>>" + arg0);
-                final JSONObject json = (JSONObject) arg0;
-                new Thread(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        // TODO Auto-generated method stub
-                        try {
-                            BaseUtil.saveFileToData(mContext, "figureurl_qq_1",
-                                    json.getString("figureurl_qq_1"));
-                            BaseUtil.saveFileToData(mContext, "figureurl_qq_2",
-                                    json.getString("figureurl_qq_2"));
-                            BaseUtil.saveFileToData(mContext, "figureurl_1",
-                                    json.getString("figureurl_1"));
-                            BaseUtil.saveFileToData(mContext, "figureurl_2",
-                                    json.getString("figureurl_2"));
-                            BaseUtil.saveFileToData(mContext, "figureurl",
-                                    json.getString("figureurl"));
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
+                boolean success = false;
+
+                final JSONObject accountJsonObject = (JSONObject) accountJson;
+
+                try {
+                    Editor editor = mConfigs.getEditor();
+                    editor.putString(Configs.KEY, accountJsonObject.getString("openid"));
+                    editor.putString(Configs.TOKEN, accountJsonObject.getString("access_token"));
+
+                    long expires_in = accountJsonObject.getLong("expires_in");
+                    expires_in = System.currentTimeMillis() + expires_in * 1000;
+
+                    editor.putLong(Configs.AUTH_TIME, expires_in);
+                    editor.putInt(Configs.TYPE, Configs.TYPE_QQ);
+                    editor.putInt(Configs.INFO_STATUS, Configs.INFO_STATUS_DEFAULT);
+                    editor.commit();
+                    success = true;
+                } catch (JSONException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+
+                if (success) {
+                    final JSONObject json = (JSONObject) arg0;
+                    try {
+                        Personal personal = new Personal();
+                        personal.setIconByte(null);
+                        personal.setIconUri(json.getString("figureurl_qq_2"));
+                        personal.setIconThumb(null);
+                        personal.setName(json.getString("nickname"));
+                        personal.setDesc(json.getString("msg"));
+                        personal.setGender(DBInfo.Personal.GENDER_NONE);
+                        personal.setLocal(json.getString("province") + "," + json.getString("city"));
+                        personal.setBirthYear(1990);
+                        personal.setBirthMonth(1);
+                        personal.setBirthDay(1);
+                        personal.setBirthType(DBInfo.Personal.BIRTH_TYPE_GREGORIAN);
+
+                        success = mDBManager.updatePersonal(personal);
+
+                        activity.getDrawerView().loadPersonData(personal);
+                        activity.getDrawerView().updateLoginStatus(true);
+                        new Thread(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                // TODO Auto-generated method stub
+                                try {
+
+                                    byte[] data =
+                                            BaseUtil.getImageData(mContext,
+                                                    json.getString("figureurl_qq_2"));
+                                    if (data != null && data.length > 0) {
+                                        ContentValues values = new ContentValues();
+                                        values.put(DBInfo.Personal.ICON_BYTE, data);
+                                        mDBManager.updatePersonal(values);
+
+
+                                    }
+
+                                } catch (JSONException e) {
+                                    // TODO Auto-generated catch block
+                                    e.printStackTrace();
+                                }
+
+                            }
+                        }).start();
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }).start();
+
+                } else {
+                    mTencent.logout(mContext);
+                }
+
+
 
             }
 
             @Override
             public void onError(UiError arg0) {
                 // TODO Auto-generated method stub
-
+                mTencent.logout(mContext);
             }
 
         });

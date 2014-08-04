@@ -15,6 +15,8 @@ public class MainApp extends Application {
         super.onCreate();
         Log.e("lmf", ">>>>MainApp>>>>>>>onCreate>>>>>>");
         QQAccountManager.getInstance(this.getApplicationContext());
+
+
     }
 
 

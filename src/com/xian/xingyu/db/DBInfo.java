@@ -1,4 +1,3 @@
-
 package com.xian.xingyu.db;
 
 import android.net.Uri;
@@ -9,49 +8,11 @@ public class DBInfo {
 
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY);
 
-    public static final class Account implements BaseColumns {
-
-        public static final String TABLE = "account";
-
-        public static final String KEY = "key";
-        public static final String TOKEN = "token";
-        public static final String AUTH_TIME = "auth_time";
-        public static final String TYPE = "type";
-        public static final String STATUS = "status";
-        public static final String INFO_STATUS = "info_status";
-
-        public static final int TYPE_DEFAULT = 0;
-        public static final int TYPE_QQ = 1;
-        public static final int TYPE_weibo = 2;
-
-        public static final int STATUS_FREE = 0;
-        public static final int STATUS_USED = 1;
-
-        public static final int INFO_STATUS_DEFAULT = 0;
-        public static final int INFO_STATUS_CUSTOM = 1;
-
-        public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/"
-                + TABLE);
-
-        public static final String[] COLUMNS = new String[] {
-                _ID, KEY, TOKEN, AUTH_TIME, TYPE, STATUS, INFO_STATUS
-        };
-
-        public static final int INDEX_ID = 0;
-        public static final int INDEX_KEY = 1;
-        public static final int INDEX_TOKEN = 2;
-        public static final int INDEX_AUTH_TIME = 3;
-        public static final int INDEX_TYPE = 4;
-        public static final int INDEX_STATUS = 5;
-        public static final int INDEX_INFO_STATUS = 6;
-
-    }
 
     public static final class Personal implements BaseColumns {
 
         public static final String TABLE = "personal";
 
-        public static final String ACCOUNT_ID = "account_id";
         public static final String ICON_BYTE = "icon_byte";
         public static final String ICON_URI = "icon_uri";
         public static final String ICON_THUMB = "icon_thumb";
@@ -71,28 +32,23 @@ public class DBInfo {
         public static final int BIRTH_TYPE_GREGORIAN = 0;
         public static final int BIRTH_TYPE_LUNAR = 1;
 
-        public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/"
-                + TABLE);
+        public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + TABLE);
 
-        public static final String[] COLUMNS = new String[] {
-                _ID, ACCOUNT_ID, ICON_BYTE, ICON_URI, ICON_THUMB, NAME, DESC, GENDER, LOCAL,
-                BIRTH_YEAR, BIRTH_MONTH, BIRTH_DAY,
-                BIRTH_TYPE
-        };
+        public static final String[] COLUMNS = new String[] {_ID, ICON_BYTE, ICON_URI, ICON_THUMB,
+                NAME, DESC, GENDER, LOCAL, BIRTH_YEAR, BIRTH_MONTH, BIRTH_DAY, BIRTH_TYPE};
 
         public static final int INDEX_ID = 0;
-        public static final int INDEX_ACCOUNT_ID = 1;
-        public static final int INDEX_ICON_BYTE = 2;
-        public static final int INDEX_ICON_URI = 3;
-        public static final int INDEX_ICON_THUMB = 4;
-        public static final int INDEX_NAME = 5;
-        public static final int INDEX_DESC = 6;
-        public static final int INDEX_GENDER = 7;
-        public static final int INDEX_LOCAL = 8;
-        public static final int INDEX_BIRTH_YEAR = 9;
-        public static final int INDEX_BIRTH_MONTH = 10;
-        public static final int INDEX_BIRTH_DAY = 11;
-        public static final int INDEX_BIRTH_TYPE = 12;
+        public static final int INDEX_ICON_BYTE = 1;
+        public static final int INDEX_ICON_URI = 2;
+        public static final int INDEX_ICON_THUMB = 3;
+        public static final int INDEX_NAME = 4;
+        public static final int INDEX_DESC = 5;
+        public static final int INDEX_GENDER = 6;
+        public static final int INDEX_LOCAL = 7;
+        public static final int INDEX_BIRTH_YEAR = 8;
+        public static final int INDEX_BIRTH_MONTH = 9;
+        public static final int INDEX_BIRTH_DAY = 10;
+        public static final int INDEX_BIRTH_TYPE = 11;
 
     }
 

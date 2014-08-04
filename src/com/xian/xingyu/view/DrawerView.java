@@ -1,8 +1,7 @@
-
 package com.xian.xingyu.view;
 
-import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.util.Log;
 import android.view.View;
@@ -16,16 +15,19 @@ import android.widget.TextView;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnClosedListener;
 import com.xian.xingyu.R;
+import com.xian.xingyu.activity.MainActivity;
 import com.xian.xingyu.activity.PersonInfoActivity;
 import com.xian.xingyu.activity.TestActivity;
+import com.xian.xingyu.bean.Personal;
 import com.xian.xingyu.login.QQAccountManager;
+import com.xian.xingyu.util.BaseUtil;
 
 /**
  * 自定义SlidingMenu 测拉菜单类
  */
 public class DrawerView implements OnClickListener {
 
-    private final Activity activity;
+    private final MainActivity activity;
     private SlidingMenu localSlidingMenu;
     private Button leftBtn1, leftBtn2, leftBtn3, rightBtn1, rightBtn2;
 
@@ -34,7 +36,7 @@ public class DrawerView implements OnClickListener {
     private LinearLayout leftLoginInfoLl;
     private ImageView leftLoginInfoIconIv;
 
-    public DrawerView(Activity activity) {
+    public DrawerView(MainActivity activity) {
         this.activity = activity;
     }
 
@@ -83,12 +85,12 @@ public class DrawerView implements OnClickListener {
         leftLoginTv = (TextView) localSlidingMenu.findViewById(R.id.left_login_tv);
         leftLoginInfoLl = (LinearLayout) localSlidingMenu.findViewById(R.id.left_login_info_ll);
 
-        leftLoginInfoTitleTv = (TextView) localSlidingMenu
-                .findViewById(R.id.left_login_info_title_tv);
-        leftLoginInfoContentTv = (TextView) localSlidingMenu
-                .findViewById(R.id.left_login_info_content_tv);
-        leftLoginInfoIconIv = (ImageView) localSlidingMenu
-                .findViewById(R.id.left_login_info_icon_iv);
+        leftLoginInfoTitleTv =
+                (TextView) localSlidingMenu.findViewById(R.id.left_login_info_title_tv);
+        leftLoginInfoContentTv =
+                (TextView) localSlidingMenu.findViewById(R.id.left_login_info_content_tv);
+        leftLoginInfoIconIv =
+                (ImageView) localSlidingMenu.findViewById(R.id.left_login_info_icon_iv);
 
         leftBtn1.setOnClickListener(this);
         leftBtn2.setOnClickListener(this);
@@ -98,6 +100,37 @@ public class DrawerView implements OnClickListener {
         leftLoginFl.setOnClickListener(this);
 
     }
+
+    public void showContent() {
+        showContent(true);
+    }
+
+    public void showContent(boolean bool) {
+        localSlidingMenu.showContent(bool);
+    }
+
+    public void showLeftMenu() {
+        showLeftMenu(true);
+    }
+
+    public void showLeftMenu(boolean bool) {
+
+        updateLoginStatus(QQAccountManager.getInstance(activity.getApplicationContext()).isLogin());
+        localSlidingMenu.showMenu(bool);
+    }
+
+    public void showRightMenu() {
+        showRightMenu(true);
+    }
+
+    public void showRightMenu(boolean bool) {
+        localSlidingMenu.showSecondaryMenu(bool);
+    }
+
+    public boolean isMenuShowing() {
+        return localSlidingMenu.isMenuShowing();
+    }
+
 
     @Override
     public void onClick(View v) {
@@ -163,6 +196,22 @@ public class DrawerView implements OnClickListener {
             leftLoginInfoLl.setVisibility(View.GONE);
             leftLoginTv.setVisibility(View.VISIBLE);
         }
+    }
+
+
+    public void loadPersonData(Personal person) {
+
+        leftLoginInfoTitleTv.setText(person.getName());
+        leftLoginInfoContentTv.setText(person.getDesc());
+
+    }
+
+    public void loadPersonIcon(byte[] data) {
+        if (data == null || data.length == 0) return;
+        Bitmap bitmap = BaseUtil.bytes2Bimap(data);
+        if (bitmap == null) return;
+        leftLoginInfoIconIv.setImageBitmap(bitmap);
+
     }
 
 }

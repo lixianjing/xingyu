@@ -1,12 +1,10 @@
-
 package com.xian.xingyu.db;
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 
-import com.xian.xingyu.bean.Account;
 import com.xian.xingyu.bean.Personal;
 
 public class DBManager {
@@ -38,64 +36,43 @@ public class DBManager {
         mCr = mContext.getContentResolver();
     }
 
-    public Uri insertAccount() {
-        return null;
+
+
+    public boolean updatePersonal(Personal personal) {
+        ContentValues values = new ContentValues();
+
+        values.put(DBInfo.Personal.ICON_BYTE, personal.getIconByte());
+        values.put(DBInfo.Personal.ICON_URI, personal.getIconUri());
+        values.put(DBInfo.Personal.ICON_THUMB, personal.getIconThumb());
+        values.put(DBInfo.Personal.NAME, personal.getName());
+        values.put(DBInfo.Personal.DESC, personal.getDesc());
+        values.put(DBInfo.Personal.GENDER, personal.getGender());
+        values.put(DBInfo.Personal.LOCAL, personal.getLocal());
+        values.put(DBInfo.Personal.BIRTH_YEAR, personal.getBirthYear());
+        values.put(DBInfo.Personal.BIRTH_MONTH, personal.getBirthMonth());
+        values.put(DBInfo.Personal.BIRTH_DAY, personal.getBirthDay());
+        values.put(DBInfo.Personal.BIRTH_TYPE, personal.getBirthType());
+
+        return mCr.update(DBInfo.Personal.CONTENT_URI, values, DBInfo.Personal._ID + " = 1", null) > 0;
     }
 
-    public Account getAccount(long id) {
-        return null;
+    public boolean updatePersonal(ContentValues values) {
+
+        return mCr.update(DBInfo.Personal.CONTENT_URI, values, DBInfo.Personal._ID + " = 1", null) > 0;
     }
 
-    public int deleteAccount(long id) {
-        return 0;
-    }
 
-    public int updateAccount(long id) {
-        return 0;
-    }
 
-    public Account getCurrentAccount() {
+    public Personal getPersonal() {
         Cursor cursor = null;
         try {
-            cursor = mCr.query(DBInfo.Account.CONTENT_URI, DBInfo.Account.COLUMNS,
-                    DBInfo.Account.STATUS + " = " + DBInfo.Account.STATUS_USED,
-                    null,
-                    null);
-            if (cursor.moveToFirst()) {
-                Account account = new Account();
-
-                account.setId(cursor.getLong(DBInfo.Account.INDEX_ID));
-                account.setKey(cursor.getString(DBInfo.Account.INDEX_KEY));
-                account.setToken(cursor.getString(DBInfo.Account.INDEX_TOKEN));
-                account.setAuthTime(cursor.getLong(DBInfo.Account.INDEX_AUTH_TIME));
-                account.setType(cursor.getInt(DBInfo.Account.INDEX_TYPE));
-                account.setStatus(cursor.getInt(DBInfo.Account.INDEX_STATUS));
-                account.setInfoStatus(cursor.getInt(DBInfo.Account.INDEX_INFO_STATUS));
-
-                return account;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (cursor != null)
-                cursor.close();
-        }
-
-        return null;
-    }
-
-    public Personal getPersonalByAccountId(long id) {
-        Cursor cursor = null;
-        try {
-            cursor = mCr.query(DBInfo.Personal.CONTENT_URI, DBInfo.Personal.COLUMNS,
-                    DBInfo.Personal.ACCOUNT_ID + " = " + id,
-                    null,
-                    null);
+            cursor =
+                    mCr.query(DBInfo.Personal.CONTENT_URI, DBInfo.Personal.COLUMNS, null, null,
+                            null);
             if (cursor.moveToFirst()) {
                 Personal personal = new Personal();
 
                 personal.setId(cursor.getLong(DBInfo.Personal.INDEX_ID));
-                personal.setAccountId(cursor.getLong(DBInfo.Personal.INDEX_ACCOUNT_ID));
                 personal.setIconByte(cursor.getBlob(DBInfo.Personal.INDEX_ICON_BYTE));
                 personal.setIconUri(cursor.getString(DBInfo.Personal.INDEX_ICON_URI));
                 personal.setIconThumb(cursor.getBlob(DBInfo.Personal.INDEX_ICON_THUMB));
@@ -113,8 +90,7 @@ public class DBManager {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (cursor != null)
-                cursor.close();
+            if (cursor != null) cursor.close();
         }
 
         return null;

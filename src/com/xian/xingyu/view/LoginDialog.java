@@ -1,7 +1,6 @@
 
 package com.xian.xingyu.view;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,14 +8,15 @@ import android.view.View;
 import android.widget.Button;
 
 import com.xian.xingyu.R;
+import com.xian.xingyu.activity.MainActivity;
 import com.xian.xingyu.login.QQAccountManager;
 
 public class LoginDialog extends Dialog implements android.view.View.OnClickListener {
 
-    private final Activity mActivity;
+    private final MainActivity mActivity;
     private Button mQqBtn, mWeiboBtn;
 
-    public LoginDialog(Activity activity) {
+    public LoginDialog(MainActivity activity) {
         super(activity, R.style.MyDialog);
         this.mActivity = activity;
     }

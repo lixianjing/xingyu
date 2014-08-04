@@ -1,4 +1,3 @@
-
 package com.xian.xingyu.db;
 
 import android.content.Context;
@@ -39,6 +38,7 @@ public class XianDataBaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         // TODO Auto-generated method stub
         createTables(db);
+        initData(db);
     }
 
     @Override
@@ -65,35 +65,34 @@ public class XianDataBaseHelper extends SQLiteOpenHelper {
         Log.e(TAG, "Destroying all old data.");
         dropAll(db);
         onCreate(db);
+
     }
 
     private void dropAll(SQLiteDatabase db) {
 
-        db.execSQL("DROP TABLE IF EXISTS " + DBInfo.Account.TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + DBInfo.Personal.TABLE);
 
     }
 
     private void createTables(SQLiteDatabase db) {
 
-        db.execSQL("CREATE TABLE " + DBInfo.Account.TABLE + " (" + DBInfo.Account._ID
-                + " INTEGER PRIMARY KEY," + DBInfo.Account.KEY + " TEXT UNIQUE,"
-                + DBInfo.Account.TOKEN
-                + " TEXT," + DBInfo.Account.AUTH_TIME + " INTEGER," + DBInfo.Account.TYPE
-                + " INTEGER," + DBInfo.Account.STATUS + " INTEGER DEFAULT 0,"
-                + DBInfo.Account.INFO_STATUS
-                + " INTEGER DEFAULT 0);");
 
         db.execSQL("CREATE TABLE " + DBInfo.Personal.TABLE + " (" + DBInfo.Personal._ID
-                + " INTEGER PRIMARY KEY," + DBInfo.Personal.ACCOUNT_ID + " INTEGER UNIQUE,"
-                + DBInfo.Personal.ICON_BYTE
-                + " BLOB," + DBInfo.Personal.ICON_URI + " TEXT," + DBInfo.Personal.ICON_THUMB
-                + " BLOB," + DBInfo.Personal.NAME + " TEXT," + DBInfo.Personal.DESC
-                + " TEXT," + DBInfo.Personal.GENDER + " INTEGER DEFAULT 0," + DBInfo.Personal.LOCAL
-                + " TEXT," + DBInfo.Personal.BIRTH_YEAR + " INTEGER,"
-                + DBInfo.Personal.BIRTH_MONTH + " INTEGER," + DBInfo.Personal.BIRTH_DAY
-                + " INTEGER," + DBInfo.Personal.BIRTH_TYPE
-                + " INTEGER DEFAULT 0);");
+                + " INTEGER PRIMARY KEY," + DBInfo.Personal.ICON_BYTE + " BLOB,"
+                + DBInfo.Personal.ICON_URI + " TEXT," + DBInfo.Personal.ICON_THUMB + " BLOB,"
+                + DBInfo.Personal.NAME + " TEXT," + DBInfo.Personal.DESC + " TEXT,"
+                + DBInfo.Personal.GENDER + " INTEGER DEFAULT 0," + DBInfo.Personal.LOCAL + " TEXT,"
+                + DBInfo.Personal.BIRTH_YEAR + " INTEGER," + DBInfo.Personal.BIRTH_MONTH
+                + " INTEGER," + DBInfo.Personal.BIRTH_DAY + " INTEGER,"
+                + DBInfo.Personal.BIRTH_TYPE + " INTEGER DEFAULT 0);");
+
+    }
+
+
+    private void initData(SQLiteDatabase db) {
+
+        db.execSQL("INSERT INTO " + DBInfo.Personal.TABLE + "(" + DBInfo.Personal.NAME
+                + ") values('')");
 
     }
 

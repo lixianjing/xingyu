@@ -1,8 +1,11 @@
-
 package com.xian.xingyu.activity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.AsyncTask;
@@ -13,6 +16,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -25,18 +29,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.xian.xingyu.R;
-import com.xian.xingyu.bean.Account;
 import com.xian.xingyu.bean.Personal;
 import com.xian.xingyu.db.DBManager;
 import com.xian.xingyu.fragment.PrivateFragment;
 import com.xian.xingyu.fragment.PublicFragment;
 import com.xian.xingyu.login.QQAccountManager;
+import com.xian.xingyu.util.Configs;
 import com.xian.xingyu.view.DrawerView;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends FragmentActivity implements OnClickListener {
 
@@ -52,8 +52,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     private ImageView mPointIv;
 
     private DrawerView drawerView;
-
-    private SlidingMenu mSlidingMenu;
 
     private DBManager mDBManager;
 
@@ -72,8 +70,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         initSlidingMenu();
         initListener();
 
-        updateLoginStatus(false);
-
         initData();
 
     }
@@ -83,7 +79,32 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         // TODO Auto-generated method stub
         super.onStart();
         Log.e("lmf", ">>>>>>>onStart>>>>>>>>>>>>>>>");
-        mSlidingMenu.showContent(false);
+        drawerView.showContent(false);
+    }
+
+
+
+    @Override
+    protected void onActivityResult(int arg0, int arg1, Intent arg2) {
+        // TODO Auto-generated method stub
+        super.onActivityResult(arg0, arg1, arg2);
+        Log.e("lmf",
+                ">>>>>>>onActivityResult>>>>>>>>>>>>>>>" + arg0 + ":" + arg1 + ":"
+                        + arg2.toString());
+    }
+
+    @Override
+    protected void onPause() {
+        // TODO Auto-generated method stub
+        super.onPause();
+        Log.e("lmf", ">>>>>>>onPause>>>>>>>>>>>>>>>");
+    }
+
+    @Override
+    protected void onResume() {
+        // TODO Auto-generated method stub
+        super.onResume();
+        Log.e("lmf", ">>>>>>>onResume>>>>>>>>>>>>>>>");
     }
 
     @Override
@@ -117,8 +138,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         DisplayMetrics dm = new DisplayMetrics(); // 获取手机分辨率
         getWindowManager().getDefaultDisplay().getMetrics(dm);
         int screenW = dm.widthPixels;// 获取分辨率宽度
-        width = BitmapFactory.decodeResource(getResources(),
-                R.drawable.viewpager_point).getWidth();// 获取图片宽度
+        width = BitmapFactory.decodeResource(getResources(), R.drawable.viewpager_point).getWidth();// 获取图片宽度
         // 计算偏移量，也就是那条粗的下划线距离屏幕坐标的距离，如果有三个view则screeW/3，以此类推
         moveX = (screenW / 2 - width) / 2;
         Matrix matrix = new Matrix();
@@ -137,23 +157,32 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     }
 
     private void initData() {
-        Account account = mDBManager.getCurrentAccount();
-        if (account != null) {
-            Personal personal = mDBManager.getPersonalByAccountId(account.getId());
-            if (personal == null) {
-                QQAccountManager.getInstance(this.getApplicationContext()).logout();
+
+        SharedPreferences pref = Configs.getInstance(mContext).getSharedPreferences();
+        String key = pref.getString(Configs.KEY, "");
+        String token = pref.getString(Configs.TOKEN, "");
+
+        if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(token)) {
+            Personal personal = mDBManager.getPersonal();
+            if (personal != null && !TextUtils.isEmpty(personal.getName())) {
+                QQAccountManager.getInstance(this.getApplicationContext()).load(key, token,
+                        (pref.getLong(Configs.AUTH_TIME, 0) - System.currentTimeMillis() / 1000));
+
+                drawerView.loadPersonData(personal);
+                drawerView.loadPersonIcon(personal.getIconThumb());
+
             } else {
-                QQAccountManager.getInstance(this.getApplicationContext()).load(account.getKey(),
-                        account.getToken(),
-                        (account.getAuthTime() - System.currentTimeMillis() / 1000));
+                QQAccountManager.getInstance(this.getApplicationContext()).logout();
             }
         }
+
+
 
     }
 
     private void initSlidingMenu() {
         drawerView = new DrawerView(this);
-        mSlidingMenu = drawerView.initSlidingMenu();
+        drawerView.initSlidingMenu();
     }
 
     private long mExitTime;
@@ -162,8 +191,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         // TODO Auto-generated method stub
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (mSlidingMenu.isMenuShowing() || mSlidingMenu.isSecondaryMenuShowing()) {
-                mSlidingMenu.showContent();
+            if (drawerView.isMenuShowing()) {
+                drawerView.showContent();
             } else {
                 if ((System.currentTimeMillis() - mExitTime) > 2000) {
                     Toast.makeText(this, "在按一次退出", Toast.LENGTH_SHORT).show();
@@ -186,31 +215,31 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         // TODO Auto-generated method stub
         switch (arg0.getId()) {
             case R.id.head_viewpage_left_tv:
-                if (mSlidingMenu.isMenuShowing()) {
-                    mSlidingMenu.showContent();
+                if (drawerView.isMenuShowing()) {
+                    drawerView.showContent();
                 } else {
                     mViewPager.setCurrentItem(0);
                 }
                 break;
             case R.id.head_viewpage_right_tv:
-                if (mSlidingMenu.isMenuShowing()) {
-                    mSlidingMenu.showContent();
+                if (drawerView.isMenuShowing()) {
+                    drawerView.showContent();
                 } else {
                     mViewPager.setCurrentItem(1);
                 }
                 break;
 
             case R.id.tab_left_rl:
-                if (mSlidingMenu.isMenuShowing()) {
-                    mSlidingMenu.showContent();
+                if (drawerView.isMenuShowing()) {
+                    drawerView.showContent();
                 } else {
-                    mSlidingMenu.showMenu(true);
+                    drawerView.showLeftMenu();
                 }
 
                 break;
             case R.id.tab_middle_rl:
-                if (mSlidingMenu.isMenuShowing()) {
-                    mSlidingMenu.showContent();
+                if (drawerView.isMenuShowing()) {
+                    drawerView.showContent();
                 } else {
 
                     Intent intent = new Intent(this, AddActivity.class);
@@ -220,10 +249,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                 }
                 break;
             case R.id.tab_right_rl:
-                if (mSlidingMenu.isMenuShowing()) {
-                    mSlidingMenu.showContent();
+                if (drawerView.isMenuShowing()) {
+                    drawerView.showContent();
                 } else {
-                    mSlidingMenu.showSecondaryMenu(true);
+                    drawerView.showRightMenu();
                 }
                 break;
 
@@ -253,28 +282,23 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     public class MyPageListener implements OnPageChangeListener {
 
         @Override
-        public void onPageScrollStateChanged(int arg0) {
-        }
+        public void onPageScrollStateChanged(int arg0) {}
 
         @Override
-        public void onPageScrolled(int arg0, float arg1, int arg2) {
-        }
+        public void onPageScrolled(int arg0, float arg1, int arg2) {}
 
         @Override
         public void onPageSelected(int arg0) {
             int x = moveX * 2 + width; // 从第一个到第二个view，粗的下划线的偏移量
             /**
-             * TranslateAnimation(float fromXDelta, float toXDelta, float
-             * fromYDelta, float toYDelta) 　 float
-             * fromXDelta:这个参数表示动画开始的点离当前View X坐标上的差值； float toXDelta,
-             * 这个参数表示动画结束的点离当前View X坐标上的差值； float fromYDelta,
-             * 这个参数表示动画开始的点离当前View Y坐标上的差值； float toYDelta)这个参数表示动画开始的点离当前View
-             * Y坐标上的差值；
+             * TranslateAnimation(float fromXDelta, float toXDelta, float fromYDelta, float
+             * toYDelta) 　 float fromXDelta:这个参数表示动画开始的点离当前View X坐标上的差值； float toXDelta,
+             * 这个参数表示动画结束的点离当前View X坐标上的差值； float fromYDelta, 这个参数表示动画开始的点离当前View Y坐标上的差值； float
+             * toYDelta)这个参数表示动画开始的点离当前View Y坐标上的差值；
              */
             Log.v("index的值为:", index + "");
             Log.v("arg0的值为:", arg0 + "");
-            Animation animation =
-                    new TranslateAnimation(x * index, x * arg0, 0, 0);
+            Animation animation = new TranslateAnimation(x * index, x * arg0, 0, 0);
             index = arg0;
 
             animation.setFillAfter(true); // 设置动画停止在结束位置
@@ -283,9 +307,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         }
     }
 
-    public void updateLoginStatus(boolean bool) {
-        drawerView.updateLoginStatus(bool);
-    }
 
     class LoginAsyncTask extends AsyncTask<Void, Void, Void> {
         private final Context context;
@@ -297,17 +318,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         @Override
         protected Void doInBackground(Void... params) {
             // TODO Auto-generated method stub
-            Account account = mDBManager.getCurrentAccount();
-            if (account == null) {
-
-            } else {
-                // String openid = "1234567896ASDFGHJKLLIUYT";
-                // String access_token = "2C0884DC4B930010D852D8D504FC9F4D";
-                // String expires_in = "7776000"; // 实际值需要通过上面介绍的方法来计算
-                // mTencent = Tencent.createInstance(APP_ID);
-                // mTencent.setOpenId(openid);
-                // mTencent.setAccessToken(access_token, expires_in);
-            }
             return null;
         }
 
@@ -318,5 +328,11 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         }
 
     }
+
+    public DrawerView getDrawerView() {
+        return drawerView;
+    }
+
+
 
 }
