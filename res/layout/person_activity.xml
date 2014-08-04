@@ -5,14 +5,14 @@
     android:orientation="vertical" >
 
     <com.xian.xingyu.view.CommonHeadView
-        android:id="@+id/add_head"
+        android:id="@+id/person_head"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0" >
     </com.xian.xingyu.view.CommonHeadView>
 
     <LinearLayout
-        android:id="@+id/test_ll"
+        android:id="@+id/person_ll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
@@ -22,7 +22,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="添加应用" />
+            android:text="个人信息" />
     </LinearLayout>
 
 </LinearLayout>

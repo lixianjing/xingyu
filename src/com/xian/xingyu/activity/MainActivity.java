@@ -1,7 +1,5 @@
-package com.xian.xingyu.activity;
 
-import java.util.ArrayList;
-import java.util.List;
+package com.xian.xingyu.activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +8,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -38,6 +38,9 @@ import com.xian.xingyu.login.QQAccountManager;
 import com.xian.xingyu.util.Configs;
 import com.xian.xingyu.view.DrawerView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends FragmentActivity implements OnClickListener {
 
     private FragmentManager mFragmentManager;
@@ -58,6 +61,16 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     int moveX; // 导航下面横线偏移宽度
     int width; // 导航下面比较粗的线的宽度
     int index; // 当前第一个view
+
+    private final Handler mHandler = new Handler() {
+
+        @Override
+        public void handleMessage(Message msg) {
+            // TODO Auto-generated method stub
+            super.handleMessage(msg);
+        }
+
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,8 +94,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         Log.e("lmf", ">>>>>>>onStart>>>>>>>>>>>>>>>");
         drawerView.showContent(false);
     }
-
-
 
     @Override
     protected void onActivityResult(int arg0, int arg1, Intent arg2) {
@@ -175,8 +186,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                 QQAccountManager.getInstance(this.getApplicationContext()).logout();
             }
         }
-
-
 
     }
 
@@ -282,19 +291,23 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     public class MyPageListener implements OnPageChangeListener {
 
         @Override
-        public void onPageScrollStateChanged(int arg0) {}
+        public void onPageScrollStateChanged(int arg0) {
+        }
 
         @Override
-        public void onPageScrolled(int arg0, float arg1, int arg2) {}
+        public void onPageScrolled(int arg0, float arg1, int arg2) {
+        }
 
         @Override
         public void onPageSelected(int arg0) {
             int x = moveX * 2 + width; // 从第一个到第二个view，粗的下划线的偏移量
             /**
-             * TranslateAnimation(float fromXDelta, float toXDelta, float fromYDelta, float
-             * toYDelta) 　 float fromXDelta:这个参数表示动画开始的点离当前View X坐标上的差值； float toXDelta,
-             * 这个参数表示动画结束的点离当前View X坐标上的差值； float fromYDelta, 这个参数表示动画开始的点离当前View Y坐标上的差值； float
-             * toYDelta)这个参数表示动画开始的点离当前View Y坐标上的差值；
+             * TranslateAnimation(float fromXDelta, float toXDelta, float
+             * fromYDelta, float toYDelta) 　 float
+             * fromXDelta:这个参数表示动画开始的点离当前View X坐标上的差值； float toXDelta,
+             * 这个参数表示动画结束的点离当前View X坐标上的差值； float fromYDelta,
+             * 这个参数表示动画开始的点离当前View Y坐标上的差值； float toYDelta)这个参数表示动画开始的点离当前View
+             * Y坐标上的差值；
              */
             Log.v("index的值为:", index + "");
             Log.v("arg0的值为:", arg0 + "");
@@ -306,7 +319,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
             mPointIv.startAnimation(animation); // 启动动画
         }
     }
-
 
     class LoginAsyncTask extends AsyncTask<Void, Void, Void> {
         private final Context context;
@@ -332,7 +344,5 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     public DrawerView getDrawerView() {
         return drawerView;
     }
-
-
 
 }

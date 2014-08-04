@@ -1,8 +1,10 @@
+
 package com.xian.xingyu.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -33,16 +35,36 @@ public class CommonHeadView extends RelativeLayout {
         mRightTv = (TextView) findViewById(R.id.head_right_tv);
         mLeftTv = (TextView) findViewById(R.id.head_left_tv);
 
-
     }
 
     public void setTitle(String text) {
         mTitleTv.setText(text);
     }
-    
+
     public void setTitle(int res) {
-        mTitleTv.setText(mContext.getString(res));
+        setTitle(mContext.getString(res));
     }
 
+    public void setLeftText(String text, OnClickListener l) {
+        mLeftTv.setText(text);
+        if (l != null)
+            mLeftTv.setOnClickListener(l);
+        mLeftTv.setVisibility(View.VISIBLE);
+    }
+
+    public void setLeftText(int res, OnClickListener l) {
+        setLeftText(mContext.getString(res), l);
+    }
+
+    public void setRightText(String text, OnClickListener l) {
+        mRightTv.setText(text);
+        if (l != null)
+            mRightTv.setOnClickListener(l);
+        mRightTv.setVisibility(View.VISIBLE);
+    }
+
+    public void setRightText(int res, OnClickListener l) {
+        setRightText(mContext.getString(res), l);
+    }
 
 }

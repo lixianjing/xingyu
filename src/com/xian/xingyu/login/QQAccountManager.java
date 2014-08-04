@@ -1,7 +1,5 @@
-package com.xian.xingyu.login;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+package com.xian.xingyu.login;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -19,16 +17,17 @@ import com.xian.xingyu.db.DBManager;
 import com.xian.xingyu.util.BaseUtil;
 import com.xian.xingyu.util.Configs;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class QQAccountManager {
 
     private static final String APP_ID = "222222";
     private final Context mContext;
 
-
-    private DBManager mDBManager;
-    private Configs mConfigs;
+    private final DBManager mDBManager;
+    private final Configs mConfigs;
     private final Tencent mTencent;
-    private UserInfo mInfo;
 
     private static QQAccountManager instance;
 
@@ -79,13 +78,26 @@ public class QQAccountManager {
             public void onComplete(Object arg0) {
                 // TODO Auto-generated method stub
 
+                final JSONObject json = (JSONObject) arg0;
 
+                try {
+                    Editor editor = mConfigs.getEditor();
+                    editor.putString(Configs.KEY, json.getString("openid"));
+                    editor.putString(Configs.TOKEN, json.getString("access_token"));
 
-                Log.e("lmf", ">>>>>>>>>>>>onComplete>>>>>>>" + arg0);
+                    long expires_in = json.getLong("expires_in");
+                    expires_in = System.currentTimeMillis() + expires_in * 1000;
 
-                Log.e("lmf", ">>>>>>>>onComplete>>>>>>>>>>>>" + System.currentTimeMillis());
-                getUserInfo(activity, arg0);
-                Log.e("lmf", ">>>>>>>>onComplete>>>>>>>>>>>>" + System.currentTimeMillis());
+                    editor.putLong(Configs.AUTH_TIME, expires_in);
+                    editor.putInt(Configs.TYPE, Configs.TYPE_QQ);
+                    editor.putInt(Configs.INFO_STATUS, Configs.INFO_STATUS_DEFAULT);
+                    editor.commit();
+                } catch (JSONException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+
+                Log.e("lmf", ">>>login>>>>>>>>>onComplete>>>>>>>" + arg0);
 
             }
 
@@ -103,10 +115,10 @@ public class QQAccountManager {
         mTencent.logout(mContext);
     }
 
-    private void getUserInfo(final MainActivity activity, final Object accountJson) {
+    public void getUserInfo(final MainActivity activity) {
 
-        mInfo = new UserInfo(mContext, mTencent.getQQToken());
-        mInfo.getUserInfo(new IUiListener() {
+        UserInfo userInfo = new UserInfo(mContext, mTencent.getQQToken());
+        userInfo.getUserInfo(new IUiListener() {
 
             @Override
             public void onCancel() {
@@ -117,83 +129,54 @@ public class QQAccountManager {
             @Override
             public void onComplete(Object arg0) {
 
-                boolean success = false;
-
-                final JSONObject accountJsonObject = (JSONObject) accountJson;
-
+                final JSONObject json = (JSONObject) arg0;
                 try {
-                    Editor editor = mConfigs.getEditor();
-                    editor.putString(Configs.KEY, accountJsonObject.getString("openid"));
-                    editor.putString(Configs.TOKEN, accountJsonObject.getString("access_token"));
+                    Personal personal = new Personal();
+                    personal.setIconByte(null);
+                    personal.setIconUri(json.getString("figureurl_qq_2"));
+                    personal.setIconThumb(null);
+                    personal.setName(json.getString("nickname"));
+                    personal.setDesc(json.getString("msg"));
+                    personal.setGender(DBInfo.Personal.GENDER_NONE);
+                    personal.setLocal(json.getString("province") + "," + json.getString("city"));
+                    personal.setBirthYear(1990);
+                    personal.setBirthMonth(1);
+                    personal.setBirthDay(1);
+                    personal.setBirthType(DBInfo.Personal.BIRTH_TYPE_GREGORIAN);
 
-                    long expires_in = accountJsonObject.getLong("expires_in");
-                    expires_in = System.currentTimeMillis() + expires_in * 1000;
+                    mDBManager.updatePersonal(personal);
 
-                    editor.putLong(Configs.AUTH_TIME, expires_in);
-                    editor.putInt(Configs.TYPE, Configs.TYPE_QQ);
-                    editor.putInt(Configs.INFO_STATUS, Configs.INFO_STATUS_DEFAULT);
-                    editor.commit();
-                    success = true;
-                } catch (JSONException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
+                    // activity.getDrawerView().loadPersonData(personal);
+                    // activity.getDrawerView().updateLoginStatus(true);
 
-                if (success) {
-                    final JSONObject json = (JSONObject) arg0;
-                    try {
-                        Personal personal = new Personal();
-                        personal.setIconByte(null);
-                        personal.setIconUri(json.getString("figureurl_qq_2"));
-                        personal.setIconThumb(null);
-                        personal.setName(json.getString("nickname"));
-                        personal.setDesc(json.getString("msg"));
-                        personal.setGender(DBInfo.Personal.GENDER_NONE);
-                        personal.setLocal(json.getString("province") + "," + json.getString("city"));
-                        personal.setBirthYear(1990);
-                        personal.setBirthMonth(1);
-                        personal.setBirthDay(1);
-                        personal.setBirthType(DBInfo.Personal.BIRTH_TYPE_GREGORIAN);
+                    new Thread(new Runnable() {
 
-                        success = mDBManager.updatePersonal(personal);
+                        @Override
+                        public void run() {
+                            // TODO Auto-generated method stub
+                            try {
 
-                        activity.getDrawerView().loadPersonData(personal);
-                        activity.getDrawerView().updateLoginStatus(true);
-                        new Thread(new Runnable() {
+                                final byte[] data =
+                                        BaseUtil.getImageData(mContext,
+                                                json.getString("figureurl_qq_2"));
+                                if (data != null && data.length > 0) {
+                                    ContentValues values = new ContentValues();
+                                    values.put(DBInfo.Personal.ICON_BYTE, data);
+                                    mDBManager.updatePersonal(values);
 
-                            @Override
-                            public void run() {
-                                // TODO Auto-generated method stub
-                                try {
-
-                                    byte[] data =
-                                            BaseUtil.getImageData(mContext,
-                                                    json.getString("figureurl_qq_2"));
-                                    if (data != null && data.length > 0) {
-                                        ContentValues values = new ContentValues();
-                                        values.put(DBInfo.Personal.ICON_BYTE, data);
-                                        mDBManager.updatePersonal(values);
-
-
-                                    }
-
-                                } catch (JSONException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
                                 }
 
+                            } catch (JSONException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
                             }
-                        }).start();
 
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                        }
+                    }).start();
 
-                } else {
-                    mTencent.logout(mContext);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-
-
 
             }
 
