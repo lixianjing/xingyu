@@ -18,7 +18,7 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnOpenListener;
 import com.xian.xingyu.R;
 import com.xian.xingyu.activity.MainActivity;
 import com.xian.xingyu.activity.PersonInfoActivity;
-import com.xian.xingyu.bean.Personal;
+import com.xian.xingyu.bean.PersonInfo;
 import com.xian.xingyu.login.QQAccountManager;
 import com.xian.xingyu.util.BaseUtil;
 
@@ -27,7 +27,7 @@ import com.xian.xingyu.util.BaseUtil;
  */
 public class DrawerView implements OnClickListener {
 
-    private Activity mActivity;
+    private final Activity mActivity;
     private SlidingMenu localSlidingMenu;
     private Button leftBtn1, leftBtn2, leftBtn3, rightBtn1, rightBtn2;
 
@@ -35,7 +35,7 @@ public class DrawerView implements OnClickListener {
     private TextView leftLoginTv, leftLoginInfoTitleTv, leftLoginInfoContentTv;
     private LinearLayout leftLoginInfoLl;
     private ImageView leftLoginInfoIconIv;
-    private Handler mHandler;
+    private final Handler mHandler;
 
     public DrawerView(Activity activity, Handler handler) {
         this.mActivity = activity;
@@ -200,11 +200,16 @@ public class DrawerView implements OnClickListener {
     }
 
 
-    public void loadPersonData(Personal person) {
+    public void loadPersonData(PersonInfo person) {
 
         leftLoginInfoTitleTv.setText(person.getName());
         leftLoginInfoContentTv.setText(person.getDesc());
 
+    }
+    
+    public void loadPersonIcon(Bitmap bitmap) {
+        leftLoginInfoIconIv.setImageBitmap(bitmap);
+        
     }
 
     public void loadPersonIcon(byte[] data) {

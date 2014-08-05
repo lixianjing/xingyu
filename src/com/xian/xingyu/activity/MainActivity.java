@@ -1,11 +1,10 @@
-package com.xian.xingyu.activity;
 
-import java.util.ArrayList;
-import java.util.List;
+package com.xian.xingyu.activity;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.AsyncTask;
@@ -32,19 +31,35 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.xian.xingyu.R;
-import com.xian.xingyu.bean.Personal;
+import com.xian.xingyu.bean.PersonInfo;
 import com.xian.xingyu.db.DBManager;
 import com.xian.xingyu.fragment.PrivateFragment;
 import com.xian.xingyu.fragment.PublicFragment;
 import com.xian.xingyu.login.QQAccountManager;
 import com.xian.xingyu.util.Configs;
 import com.xian.xingyu.view.DrawerView;
+import com.xian.xingyu.view.LoadingDialog;
 import com.xian.xingyu.view.LoginDialog;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends FragmentActivity implements OnClickListener {
 
-
     public static final int MSG_LOGIN_SHOW_DIALOG = 1001;
+    public static final int MSG_LOGIN_QQ = 1002;
+    public static final int MSG_LOGIN_WEIBO = 1003;
+
+    public static final int MSG_LOGIN_CANCEL = 1004;
+    public static final int MSG_LOGIN_ERROR = 1005;
+    public static final int MSG_LOGIN_SUCCESS = 1006;
+
+    public static final int MSG_LOGIN_GET_INFO_CANCEL = 1007;
+    public static final int MSG_LOGIN_GET_INFO_ERROR = 1008;
+    public static final int MSG_LOGIN_GET_INFO_SUCCESS = 1009;
+
+    public static final int MSG_LOGIN_GET_ICON_SUCCESS = 1010;
+    public static final int MSG_LOGIN_GET_ICON_ERROR = 1011;
 
     private FragmentManager mFragmentManager;
     private Context mContext;
@@ -66,6 +81,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     int index; // 当前第一个view
 
     private LoginDialog dialogLogin;
+    private LoadingDialog dialogLoading;
+    private QQAccountManager mQQManager;
 
     private final Handler mHandler = new Handler() {
 
@@ -76,10 +93,70 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
             switch (msg.what) {
                 case MSG_LOGIN_SHOW_DIALOG:
 
-                    if (dialogLogin == null) dialogLogin = new LoginDialog(MainActivity.this);
-                    if (dialogLogin.isShowing()) return;
-                    dialogLogin.show();
+                    showDialogLogin(true);
 
+                    break;
+                case MSG_LOGIN_QQ:
+
+                    mQQManager.login(MainActivity.this);
+
+
+                    break;
+                case MSG_LOGIN_WEIBO:
+
+                    mQQManager.login(MainActivity.this);
+                    break;
+
+                case MSG_LOGIN_CANCEL:
+                    Log.e("lmf", ">>>login>>>>>>>>>MSG_LOGIN_CANCEL>>>>>>>");
+                    break;
+                case MSG_LOGIN_ERROR:
+                    Log.e("lmf", ">>>login>>>>>>>>>MSG_LOGIN_ERROR>>>>>>>");
+                    break;
+                case MSG_LOGIN_SUCCESS:
+                    showDialogLoading(true);
+                    mQQManager.getUserInfo();
+
+                    break;
+
+                case MSG_LOGIN_GET_INFO_CANCEL:
+                    Log.e("lmf", ">>>login>>>>>>>>>MSG_LOGIN_GET_INFO_CANCEL>>>>>>>");
+                    showDialogLoading(false);
+                    mQQManager.logout();
+
+                    break;
+                case MSG_LOGIN_GET_INFO_ERROR:
+                    Log.e("lmf", ">>>login>>>>>>>>>MSG_LOGIN_GET_INFO_ERROR>>>>>>>");
+                    showDialogLoading(false);
+                    mQQManager.logout();
+                    break;
+                case MSG_LOGIN_GET_INFO_SUCCESS:
+                    final PersonInfo info = (PersonInfo) msg.obj;
+                    drawerView.loadPersonData(info);
+                    drawerView.updateLoginStatus(true);
+                    new Thread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            // TODO Auto-generated method stub
+                            mQQManager.getUserThumbIcon(info.getIconThumbUri());
+                        }
+                    }).start();
+                    Log.e("lmf",
+                            ">>>login>>>>>>>>>MSG_LOGIN_GET_INFO_SUCCESS>>>>>>>" + info.toString());
+                    break;
+
+                case MSG_LOGIN_GET_ICON_SUCCESS:
+                    Log.e("lmf", ">>>login>>>>>>>>>MSG_LOGIN_GET_ICON_SUCCESS>>>>>>>");
+                    showDialogLoading(false);
+                    Bitmap bitmap = (Bitmap) msg.obj;
+                    drawerView.loadPersonIcon(bitmap);
+                    Log.e("lmf",
+                            ">>>login>>>>>>>>>MSG_LOGIN_GET_INFO_SUCCESS>>>>>>>" + bitmap);
+                    break;
+                case MSG_LOGIN_GET_ICON_ERROR:
+                    showDialogLoading(false);
+                    Log.e("lmf", ">>>login>>>>>>>>>MSG_LOGIN_GET_ICON_ERROR>>>>>>>");
                     break;
 
                 default:
@@ -89,6 +166,29 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 
     };
 
+    public void showDialogLogin(boolean bool) {
+        if (dialogLogin == null)
+            dialogLogin = new LoginDialog(MainActivity.this, mHandler);
+        if (dialogLogin.isShowing() && bool)
+            return;
+        if (bool)
+            dialogLogin.show();
+        else
+            dialogLogin.dismiss();
+    }
+
+    public void showDialogLoading(boolean bool) {
+        Log.e("lmf", ">>>>>>>>>>>showDialogLoading>>>>>");
+        if (dialogLoading == null)
+            dialogLoading = new LoadingDialog(MainActivity.this);
+        if (dialogLoading.isShowing() && bool)
+            return;
+        if (bool)
+            dialogLoading.show();
+        else
+            dialogLoading.dismiss();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,6 +196,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         mFragmentManager = getSupportFragmentManager();
         setContentView(R.layout.main);
         mDBManager = DBManager.getInstance(mContext);
+
+        mQQManager = QQAccountManager.getInstance(mContext);
+        mQQManager.setHanlder(mHandler);
+
         initView();
         initSlidingMenu();
         initListener();
@@ -191,9 +295,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         String token = pref.getString(Configs.TOKEN, "");
 
         if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(token)) {
-            Personal personal = mDBManager.getPersonal();
+            PersonInfo personal = mDBManager.getPersonal();
             if (personal != null && !TextUtils.isEmpty(personal.getName())) {
-                QQAccountManager.getInstance(this.getApplicationContext()).load(key, token,
+                QQAccountManager.getInstance(this.getApplicationContext()).loadAccount(key, token,
                         (pref.getLong(Configs.AUTH_TIME, 0) - System.currentTimeMillis() / 1000));
 
                 drawerView.loadPersonData(personal);
@@ -205,8 +309,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         }
 
     }
-
-
 
     private void initSlidingMenu() {
         drawerView = new DrawerView(this, mHandler);
@@ -310,19 +412,23 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     public class MyPageListener implements OnPageChangeListener {
 
         @Override
-        public void onPageScrollStateChanged(int arg0) {}
+        public void onPageScrollStateChanged(int arg0) {
+        }
 
         @Override
-        public void onPageScrolled(int arg0, float arg1, int arg2) {}
+        public void onPageScrolled(int arg0, float arg1, int arg2) {
+        }
 
         @Override
         public void onPageSelected(int arg0) {
             int x = moveX * 2 + width; // 从第一个到第二个view，粗的下划线的偏移量
             /**
-             * TranslateAnimation(float fromXDelta, float toXDelta, float fromYDelta, float
-             * toYDelta) 　 float fromXDelta:这个参数表示动画开始的点离当前View X坐标上的差值； float toXDelta,
-             * 这个参数表示动画结束的点离当前View X坐标上的差值； float fromYDelta, 这个参数表示动画开始的点离当前View Y坐标上的差值； float
-             * toYDelta)这个参数表示动画开始的点离当前View Y坐标上的差值；
+             * TranslateAnimation(float fromXDelta, float toXDelta, float
+             * fromYDelta, float toYDelta) 　 float
+             * fromXDelta:这个参数表示动画开始的点离当前View X坐标上的差值； float toXDelta,
+             * 这个参数表示动画结束的点离当前View X坐标上的差值； float fromYDelta,
+             * 这个参数表示动画开始的点离当前View Y坐标上的差值； float toYDelta)这个参数表示动画开始的点离当前View
+             * Y坐标上的差值；
              */
             Log.v("index的值为:", index + "");
             Log.v("arg0的值为:", arg0 + "");

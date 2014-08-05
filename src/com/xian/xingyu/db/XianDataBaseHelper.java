@@ -1,3 +1,4 @@
+
 package com.xian.xingyu.db;
 
 import android.content.Context;
@@ -76,10 +77,10 @@ public class XianDataBaseHelper extends SQLiteOpenHelper {
 
     private void createTables(SQLiteDatabase db) {
 
-
         db.execSQL("CREATE TABLE " + DBInfo.Personal.TABLE + " (" + DBInfo.Personal._ID
-                + " INTEGER PRIMARY KEY," + DBInfo.Personal.ICON_BYTE + " BLOB,"
+                + " INTEGER PRIMARY KEY," + DBInfo.Personal.ICON + " BLOB,"
                 + DBInfo.Personal.ICON_URI + " TEXT," + DBInfo.Personal.ICON_THUMB + " BLOB,"
+                + DBInfo.Personal.ICON_THUMB_URI + " TEXT,"
                 + DBInfo.Personal.NAME + " TEXT," + DBInfo.Personal.DESC + " TEXT,"
                 + DBInfo.Personal.GENDER + " INTEGER DEFAULT 0," + DBInfo.Personal.LOCAL + " TEXT,"
                 + DBInfo.Personal.BIRTH_YEAR + " INTEGER," + DBInfo.Personal.BIRTH_MONTH
@@ -87,7 +88,6 @@ public class XianDataBaseHelper extends SQLiteOpenHelper {
                 + DBInfo.Personal.BIRTH_TYPE + " INTEGER DEFAULT 0);");
 
     }
-
 
     private void initData(SQLiteDatabase db) {
 

@@ -4,6 +4,10 @@ package com.xian.xingyu.login;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Bitmap;
+import android.os.Handler;
+import android.os.Message;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.tencent.connect.UserInfo;
@@ -11,7 +15,7 @@ import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.Tencent;
 import com.tencent.tauth.UiError;
 import com.xian.xingyu.activity.MainActivity;
-import com.xian.xingyu.bean.Personal;
+import com.xian.xingyu.bean.PersonInfo;
 import com.xian.xingyu.db.DBInfo;
 import com.xian.xingyu.db.DBManager;
 import com.xian.xingyu.util.BaseUtil;
@@ -28,6 +32,7 @@ public class QQAccountManager {
     private final DBManager mDBManager;
     private final Configs mConfigs;
     private final Tencent mTencent;
+    private Handler mHanlder;
 
     private static QQAccountManager instance;
 
@@ -48,7 +53,7 @@ public class QQAccountManager {
     private QQAccountManager(Context context) {
         super();
         this.mContext = context;
-        mTencent = Tencent.createInstance(APP_ID, mContext);
+        mTencent = Tencent.createInstance(APP_ID, context.getApplicationContext());
         mDBManager = DBManager.getInstance(context.getApplicationContext());
         mConfigs = Configs.getInstance(context.getApplicationContext());
 
@@ -71,7 +76,7 @@ public class QQAccountManager {
             @Override
             public void onCancel() {
                 // TODO Auto-generated method stub
-
+                mHanlder.sendEmptyMessage(MainActivity.MSG_LOGIN_CANCEL);
             }
 
             @Override
@@ -92,9 +97,11 @@ public class QQAccountManager {
                     editor.putInt(Configs.TYPE, Configs.TYPE_QQ);
                     editor.putInt(Configs.INFO_STATUS, Configs.INFO_STATUS_DEFAULT);
                     editor.commit();
+                    mHanlder.sendEmptyMessage(MainActivity.MSG_LOGIN_SUCCESS);
                 } catch (JSONException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
+                    mHanlder.sendEmptyMessage(MainActivity.MSG_LOGIN_ERROR);
                 }
 
                 Log.e("lmf", ">>>login>>>>>>>>>onComplete>>>>>>>" + arg0);
@@ -104,7 +111,7 @@ public class QQAccountManager {
             @Override
             public void onError(UiError arg0) {
                 // TODO Auto-generated method stub
-
+                mHanlder.sendEmptyMessage(MainActivity.MSG_LOGIN_ERROR);
             }
 
         });
@@ -115,7 +122,7 @@ public class QQAccountManager {
         mTencent.logout(mContext);
     }
 
-    public void getUserInfo(final MainActivity activity) {
+    public void getUserInfo() {
 
         UserInfo userInfo = new UserInfo(mContext, mTencent.getQQToken());
         userInfo.getUserInfo(new IUiListener() {
@@ -123,7 +130,7 @@ public class QQAccountManager {
             @Override
             public void onCancel() {
                 // TODO Auto-generated method stub
-                mTencent.logout(mContext);
+                mHanlder.sendEmptyMessage(MainActivity.MSG_LOGIN_GET_INFO_CANCEL);
             }
 
             @Override
@@ -131,10 +138,12 @@ public class QQAccountManager {
 
                 final JSONObject json = (JSONObject) arg0;
                 try {
-                    Personal personal = new Personal();
-                    personal.setIconByte(null);
-                    personal.setIconUri(json.getString("figureurl_qq_2"));
+
+                    PersonInfo personal = new PersonInfo();
+                    personal.setIcon(null);
+                    personal.setIconUri(null);
                     personal.setIconThumb(null);
+                    personal.setIconThumbUri(json.getString("figureurl_qq_2"));
                     personal.setName(json.getString("nickname"));
                     personal.setDesc(json.getString("msg"));
                     personal.setGender(DBInfo.Personal.GENDER_NONE);
@@ -146,36 +155,14 @@ public class QQAccountManager {
 
                     mDBManager.updatePersonal(personal);
 
-                    // activity.getDrawerView().loadPersonData(personal);
-                    // activity.getDrawerView().updateLoginStatus(true);
-
-                    new Thread(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            // TODO Auto-generated method stub
-                            try {
-
-                                final byte[] data =
-                                        BaseUtil.getImageData(mContext,
-                                                json.getString("figureurl_qq_2"));
-                                if (data != null && data.length > 0) {
-                                    ContentValues values = new ContentValues();
-                                    values.put(DBInfo.Personal.ICON_BYTE, data);
-                                    mDBManager.updatePersonal(values);
-
-                                }
-
-                            } catch (JSONException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            }
-
-                        }
-                    }).start();
+                    Message message = mHanlder
+                            .obtainMessage(MainActivity.MSG_LOGIN_GET_INFO_SUCCESS);
+                    message.obj = personal;
+                    message.sendToTarget();
 
                 } catch (Exception e) {
                     e.printStackTrace();
+                    mHanlder.sendEmptyMessage(MainActivity.MSG_LOGIN_GET_INFO_ERROR);
                 }
 
             }
@@ -183,16 +170,48 @@ public class QQAccountManager {
             @Override
             public void onError(UiError arg0) {
                 // TODO Auto-generated method stub
-                mTencent.logout(mContext);
+                mHanlder.sendEmptyMessage(MainActivity.MSG_LOGIN_GET_INFO_ERROR);
             }
 
         });
     }
 
-    public void load(String openid, String accessToken, long expiresIn) {
+    public void getUserThumbIcon(String uri) {
+        if (TextUtils.isEmpty(uri)) {
+            mHanlder.sendEmptyMessage(MainActivity.MSG_LOGIN_GET_ICON_ERROR);
+            return;
+        }
+
+        final byte[] data =
+                BaseUtil.getImageData(mContext, uri);
+        if (data != null && data.length > 0) {
+            ContentValues values = new ContentValues();
+            values.put(DBInfo.Personal.ICON_THUMB, data);
+
+            Bitmap bitmap = BaseUtil.bytes2Bimap(data);
+            if (bitmap != null) {
+                mDBManager.updatePersonal(values);
+
+                Message message = mHanlder
+                        .obtainMessage(MainActivity.MSG_LOGIN_GET_ICON_SUCCESS);
+                message.obj = bitmap;
+                message.sendToTarget();
+                return;
+            }
+
+        }
+        mHanlder.sendEmptyMessage(MainActivity.MSG_LOGIN_GET_ICON_ERROR);
+
+    }
+
+    public void loadAccount(String openid, String accessToken, long expiresIn) {
         // TODO Auto-generated method stub
         mTencent.setOpenId(openid);
         mTencent.setAccessToken(accessToken, String.valueOf(expiresIn));
+    }
+
+    public void setHanlder(Handler mHanlder) {
+        this.mHanlder = mHanlder;
     }
 
 }

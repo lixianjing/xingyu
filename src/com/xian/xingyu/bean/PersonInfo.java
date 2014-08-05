@@ -1,13 +1,14 @@
 
 package com.xian.xingyu.bean;
 
-public class Personal {
+public class PersonInfo {
 
     private long id;
     private long accountId;
-    private byte[] iconByte;
+    private byte[] icon;
     private String iconUri;
     private byte[] iconThumb;
+    private String iconThumbUri;
     private String name;
     private String desc;
     private int gender;
@@ -17,28 +18,30 @@ public class Personal {
     private int birthDay;
     private int birthType;
 
-    public Personal() {
+    public PersonInfo() {
         super();
     }
 
-    public Personal(long id, long accountId, byte[] iconByte, String iconUri, byte[] iconThumb,
-            String name, String desc, int gender, String local, int birth_year, int birth_month,
-            int birth_day, int birth_type) {
+    public PersonInfo(long id, long accountId, byte[] icon, String iconUri, byte[] iconThumb,
+            String iconThumbUri, String name, String desc, int gender, String local, int birthYear,
+            int birthMonth, int birthDay, int birthType) {
         super();
         this.id = id;
         this.accountId = accountId;
-        this.iconByte = iconByte;
+        this.icon = icon;
         this.iconUri = iconUri;
         this.iconThumb = iconThumb;
+        this.iconThumbUri = iconThumbUri;
         this.name = name;
         this.desc = desc;
         this.gender = gender;
         this.local = local;
-        this.birthYear = birth_year;
-        this.birthMonth = birth_month;
-        this.birthDay = birth_day;
-        this.birthType = birth_type;
+        this.birthYear = birthYear;
+        this.birthMonth = birthMonth;
+        this.birthDay = birthDay;
+        this.birthType = birthType;
     }
+
 
     public long getId() {
         return id;
@@ -56,13 +59,22 @@ public class Personal {
         this.accountId = accountId;
     }
 
-    public byte[] getIconByte() {
-        return iconByte;
+    public byte[] getIcon() {
+        return icon;
+    }
+    
+    public void setIcon(byte[] icon) {
+        this.icon = icon;
+    }
+    
+    public String getIconThumbUri() {
+        return iconThumbUri;
     }
 
-    public void setIconByte(byte[] iconByte) {
-        this.iconByte = iconByte;
+    public void setIconThumbUri(String iconThumbUri) {
+        this.iconThumbUri = iconThumbUri;
     }
+
 
     public String getIconUri() {
         return iconUri;
@@ -115,31 +127,31 @@ public class Personal {
     public int getBirthYear() {
         return birthYear;
     }
-    
+
     public void setBirthYear(int birthYear) {
         this.birthYear = birthYear;
     }
-    
+
     public int getBirthMonth() {
         return birthMonth;
     }
-    
+
     public void setBirthMonth(int birthMonth) {
         this.birthMonth = birthMonth;
     }
-    
+
     public int getBirthDay() {
         return birthDay;
     }
-    
+
     public void setBirthDay(int birthDay) {
         this.birthDay = birthDay;
     }
-    
+
     public int getBirthType() {
         return birthType;
     }
-    
+
     public void setBirthType(int birthType) {
         this.birthType = birthType;
     }

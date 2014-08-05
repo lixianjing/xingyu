@@ -5,7 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
-import com.xian.xingyu.bean.Personal;
+import com.xian.xingyu.bean.PersonInfo;
 
 public class DBManager {
 
@@ -38,12 +38,13 @@ public class DBManager {
 
 
 
-    public boolean updatePersonal(Personal personal) {
+    public boolean updatePersonal(PersonInfo personal) {
         ContentValues values = new ContentValues();
 
-        values.put(DBInfo.Personal.ICON_BYTE, personal.getIconByte());
+        values.put(DBInfo.Personal.ICON, personal.getIcon());
         values.put(DBInfo.Personal.ICON_URI, personal.getIconUri());
         values.put(DBInfo.Personal.ICON_THUMB, personal.getIconThumb());
+        values.put(DBInfo.Personal.ICON_THUMB_URI, personal.getIconThumbUri());
         values.put(DBInfo.Personal.NAME, personal.getName());
         values.put(DBInfo.Personal.DESC, personal.getDesc());
         values.put(DBInfo.Personal.GENDER, personal.getGender());
@@ -63,19 +64,20 @@ public class DBManager {
 
 
 
-    public Personal getPersonal() {
+    public PersonInfo getPersonal() {
         Cursor cursor = null;
         try {
             cursor =
                     mCr.query(DBInfo.Personal.CONTENT_URI, DBInfo.Personal.COLUMNS, null, null,
                             null);
             if (cursor.moveToFirst()) {
-                Personal personal = new Personal();
+                PersonInfo personal = new PersonInfo();
 
                 personal.setId(cursor.getLong(DBInfo.Personal.INDEX_ID));
-                personal.setIconByte(cursor.getBlob(DBInfo.Personal.INDEX_ICON_BYTE));
+                personal.setIcon(cursor.getBlob(DBInfo.Personal.INDEX_ICON));
                 personal.setIconUri(cursor.getString(DBInfo.Personal.INDEX_ICON_URI));
                 personal.setIconThumb(cursor.getBlob(DBInfo.Personal.INDEX_ICON_THUMB));
+                personal.setIconThumbUri(cursor.getString(DBInfo.Personal.INDEX_ICON_THUMB_URI));
                 personal.setName(cursor.getString(DBInfo.Personal.INDEX_NAME));
                 personal.setDesc(cursor.getString(DBInfo.Personal.INDEX_DESC));
                 personal.setGender(cursor.getInt(DBInfo.Personal.INDEX_GENDER));

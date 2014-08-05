@@ -9,7 +9,7 @@ import com.xian.xingyu.R;
 
 public class LoadingDialog extends Dialog {
 
-    private Context mContext;
+    private final Context mContext;
     private TextView mLoadingTv;
 
     public LoadingDialog(Context context) {
@@ -22,7 +22,9 @@ public class LoadingDialog extends Dialog {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.dialog_loading);
+        this.setCancelable(false);
         mLoadingTv = (TextView) findViewById(R.id.dialog_loading_tv);
+
 
     }
 
