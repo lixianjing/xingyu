@@ -25,7 +25,7 @@ public class LoginDialog extends Dialog implements android.view.View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.dialog);
+        this.setContentView(R.layout.dialog_login);
         mQqBtn = (Button) findViewById(R.id.login_qq_btn);
         mWeiboBtn = (Button) findViewById(R.id.login_weibo_btn);
 

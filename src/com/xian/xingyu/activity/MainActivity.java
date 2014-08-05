@@ -1,5 +1,7 @@
-
 package com.xian.xingyu.activity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import android.content.Context;
 import android.content.Intent;
@@ -37,11 +39,12 @@ import com.xian.xingyu.fragment.PublicFragment;
 import com.xian.xingyu.login.QQAccountManager;
 import com.xian.xingyu.util.Configs;
 import com.xian.xingyu.view.DrawerView;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.xian.xingyu.view.LoginDialog;
 
 public class MainActivity extends FragmentActivity implements OnClickListener {
+
+
+    public static final int MSG_LOGIN_SHOW_DIALOG = 1001;
 
     private FragmentManager mFragmentManager;
     private Context mContext;
@@ -62,12 +65,26 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     int width; // 导航下面比较粗的线的宽度
     int index; // 当前第一个view
 
+    private LoginDialog dialogLogin;
+
     private final Handler mHandler = new Handler() {
 
         @Override
         public void handleMessage(Message msg) {
             // TODO Auto-generated method stub
             super.handleMessage(msg);
+            switch (msg.what) {
+                case MSG_LOGIN_SHOW_DIALOG:
+
+                    if (dialogLogin == null) dialogLogin = new LoginDialog(MainActivity.this);
+                    if (dialogLogin.isShowing()) return;
+                    dialogLogin.show();
+
+                    break;
+
+                default:
+                    break;
+            }
         }
 
     };
@@ -189,8 +206,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 
     }
 
+
+
     private void initSlidingMenu() {
-        drawerView = new DrawerView(this);
+        drawerView = new DrawerView(this, mHandler);
         drawerView.initSlidingMenu();
     }
 
@@ -291,23 +310,19 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     public class MyPageListener implements OnPageChangeListener {
 
         @Override
-        public void onPageScrollStateChanged(int arg0) {
-        }
+        public void onPageScrollStateChanged(int arg0) {}
 
         @Override
-        public void onPageScrolled(int arg0, float arg1, int arg2) {
-        }
+        public void onPageScrolled(int arg0, float arg1, int arg2) {}
 
         @Override
         public void onPageSelected(int arg0) {
             int x = moveX * 2 + width; // 从第一个到第二个view，粗的下划线的偏移量
             /**
-             * TranslateAnimation(float fromXDelta, float toXDelta, float
-             * fromYDelta, float toYDelta) 　 float
-             * fromXDelta:这个参数表示动画开始的点离当前View X坐标上的差值； float toXDelta,
-             * 这个参数表示动画结束的点离当前View X坐标上的差值； float fromYDelta,
-             * 这个参数表示动画开始的点离当前View Y坐标上的差值； float toYDelta)这个参数表示动画开始的点离当前View
-             * Y坐标上的差值；
+             * TranslateAnimation(float fromXDelta, float toXDelta, float fromYDelta, float
+             * toYDelta) 　 float fromXDelta:这个参数表示动画开始的点离当前View X坐标上的差值； float toXDelta,
+             * 这个参数表示动画结束的点离当前View X坐标上的差值； float fromYDelta, 这个参数表示动画开始的点离当前View Y坐标上的差值； float
+             * toYDelta)这个参数表示动画开始的点离当前View Y坐标上的差值；
              */
             Log.v("index的值为:", index + "");
             Log.v("arg0的值为:", arg0 + "");

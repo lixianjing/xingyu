@@ -1,8 +1,9 @@
 package com.xian.xingyu.view;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -13,11 +14,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
-import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnClosedListener;
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnOpenListener;
 import com.xian.xingyu.R;
 import com.xian.xingyu.activity.MainActivity;
 import com.xian.xingyu.activity.PersonInfoActivity;
-import com.xian.xingyu.activity.TestActivity;
 import com.xian.xingyu.bean.Personal;
 import com.xian.xingyu.login.QQAccountManager;
 import com.xian.xingyu.util.BaseUtil;
@@ -27,7 +27,7 @@ import com.xian.xingyu.util.BaseUtil;
  */
 public class DrawerView implements OnClickListener {
 
-    private final MainActivity activity;
+    private Activity mActivity;
     private SlidingMenu localSlidingMenu;
     private Button leftBtn1, leftBtn2, leftBtn3, rightBtn1, rightBtn2;
 
@@ -35,40 +35,44 @@ public class DrawerView implements OnClickListener {
     private TextView leftLoginTv, leftLoginInfoTitleTv, leftLoginInfoContentTv;
     private LinearLayout leftLoginInfoLl;
     private ImageView leftLoginInfoIconIv;
+    private Handler mHandler;
 
-    public DrawerView(MainActivity activity) {
-        this.activity = activity;
+    public DrawerView(Activity activity, Handler handler) {
+        this.mActivity = activity;
+        this.mHandler = handler;
     }
 
     public SlidingMenu initSlidingMenu() {
-        localSlidingMenu = new SlidingMenu(activity);
+        localSlidingMenu = new SlidingMenu(mActivity);
         localSlidingMenu.setMode(SlidingMenu.LEFT_RIGHT);// 设置左右滑菜单
-        localSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);// 设置要使菜单滑动，触碰屏幕的范围
-        localSlidingMenu.setTouchModeBehind(SlidingMenu.TOUCHMODE_MARGIN);// 设置了这个会获取不到菜单里面的焦点，所以先注释掉
+        // localSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);// 设置要使菜单滑动，触碰屏幕的范围
+        // // 设置了这个会获取不到菜单里面的焦点，所以先注释掉
+        // localSlidingMenu.setTouchModeBehind(SlidingMenu.TOUCHMODE_MARGIN);
+
         localSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);// 设置阴影图片的宽度
         localSlidingMenu.setShadowDrawable(R.drawable.shadow);// 设置阴影图片
         localSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);// SlidingMenu划出时主页面显示的剩余宽度
         localSlidingMenu.setFadeDegree(0.35F);// SlidingMenu滑动时的渐变程度
-        localSlidingMenu.attachToActivity(activity, SlidingMenu.RIGHT);// 使SlidingMenu附加在Activity右边
+        // 使SlidingMenu附加在Activity右边
+        localSlidingMenu.attachToActivity(mActivity, SlidingMenu.SLIDING_WINDOW);
         // localSlidingMenu.setBehindWidthRes(R.dimen.left_drawer_avatar_size);//设置SlidingMenu菜单的宽度
         localSlidingMenu.setMenu(R.layout.slidingmenu_left);// 设置menu的布局文件
         // localSlidingMenu.toggle();//动态判断自动关闭或开启SlidingMenu
         localSlidingMenu.setSecondaryMenu(R.layout.slidingmenu_right);
         localSlidingMenu.setSecondaryShadowDrawable(R.drawable.shadowright);
-        localSlidingMenu.setOnOpenedListener(new SlidingMenu.OnOpenedListener() {
-            @Override
-            public void onOpened() {
+        localSlidingMenu.setTouchmodeMarginThreshold(0);
 
-            }
-        });
-        localSlidingMenu.setOnClosedListener(new OnClosedListener() {
+
+        localSlidingMenu.setOnOpenListener(new OnOpenListener() {
 
             @Override
-            public void onClosed() {
+            public void onOpen() {
                 // TODO Auto-generated method stub
-
+                updateLoginStatus(QQAccountManager.getInstance(mActivity.getApplicationContext())
+                        .isLogin());
             }
         });
+
         initView();
         return localSlidingMenu;
     }
@@ -115,7 +119,7 @@ public class DrawerView implements OnClickListener {
 
     public void showLeftMenu(boolean bool) {
 
-        updateLoginStatus(QQAccountManager.getInstance(activity.getApplicationContext()).isLogin());
+        // updateLoginStatus(QQAccountManager.getInstance(activity.getApplicationContext()).isLogin());
         localSlidingMenu.showMenu(bool);
     }
 
@@ -137,16 +141,17 @@ public class DrawerView implements OnClickListener {
         switch (v.getId()) {
             case R.id.left_login_fl:
 
-                if (QQAccountManager.getInstance(activity.getApplicationContext()).isLogin()) {
+                if (QQAccountManager.getInstance(mActivity.getApplicationContext()).isLogin()) {
 
                     Log.e("lmf", ">>>>>>>>>>login>>>>>>>>>>>");
-                    activity.startActivity(new Intent(activity, PersonInfoActivity.class));
-                    activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                    mActivity.startActivity(new Intent(mActivity, PersonInfoActivity.class));
+                    mActivity.overridePendingTransition(R.anim.slide_in_right,
+                            R.anim.slide_out_left);
                 } else {
-                    Log.e("lmf", ">>>>>>>>>>not login>>>>>>>>>>>");
-                    LoginDialog dialog = new LoginDialog(activity);
 
-                    dialog.show();
+                    mHandler.sendEmptyMessage(MainActivity.MSG_LOGIN_SHOW_DIALOG);
+                    Log.e("lmf", ">>>>>>>>>>not login>>>>>>>>>>>");
+
                 }
 
                 break;
@@ -156,18 +161,18 @@ public class DrawerView implements OnClickListener {
                 break;
             case R.id.left_btn2:
                 Log.e("lmf", ">>>>>>>>>>left_btn2>>>>>>>>>>>");
-                activity.startActivity(new Intent(activity, TestActivity.class));
-                activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                // mContext.startActivity(new Intent(mContext, TestActivity.class));
+                // mContext.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 break;
             case R.id.left_btn3:
                 Log.e("lmf", ">>>>>>>>>>left_btn3>>>>>>>>>>>");
-                activity.startActivity(new Intent(activity, TestActivity.class));
-                activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                // mContext.startActivity(new Intent(activity, TestActivity.class));
+                // mContext.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 break;
             case R.id.right_btn1:
                 Log.e("lmf", ">>>>>>>>>>right_btn1>>>>>>>>>>>");
-                activity.startActivity(new Intent(activity, TestActivity.class));
-                activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                // activity.startActivity(new Intent(activity, TestActivity.class));
+                // activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 break;
             case R.id.right_btn2:
                 Log.e("lmf", ">>>>>>>>>>right_btn1>>>>>>>>>>>");
@@ -176,10 +181,6 @@ public class DrawerView implements OnClickListener {
                 // activity.overridePendingTransition(R.anim.slide_in_right,
                 // R.anim.slide_out_left);
 
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.setData(Uri.parse("http://www.baidu.com"));
-                activity.startActivity(intent);
 
                 break;
 
@@ -207,11 +208,14 @@ public class DrawerView implements OnClickListener {
     }
 
     public void loadPersonIcon(byte[] data) {
+        Log.e("lmf", "loadPersonIcon>>>>>>>>>" + data);
         if (data == null || data.length == 0) return;
         Bitmap bitmap = BaseUtil.bytes2Bimap(data);
         if (bitmap == null) return;
         leftLoginInfoIconIv.setImageBitmap(bitmap);
 
     }
+
+
 
 }
