@@ -1,3 +1,4 @@
+
 package com.xian.xingyu.view;
 
 import android.app.Activity;
@@ -15,11 +16,12 @@ import android.widget.TextView;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnOpenListener;
+import com.xian.xingyu.MainApp;
 import com.xian.xingyu.R;
 import com.xian.xingyu.activity.MainActivity;
 import com.xian.xingyu.activity.PersonInfoActivity;
+import com.xian.xingyu.activity.SettingsActivity;
 import com.xian.xingyu.bean.PersonInfo;
-import com.xian.xingyu.login.QQAccountManager;
 import com.xian.xingyu.util.BaseUtil;
 
 /**
@@ -45,7 +47,8 @@ public class DrawerView implements OnClickListener {
     public SlidingMenu initSlidingMenu() {
         localSlidingMenu = new SlidingMenu(mActivity);
         localSlidingMenu.setMode(SlidingMenu.LEFT_RIGHT);// 设置左右滑菜单
-        // localSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);// 设置要使菜单滑动，触碰屏幕的范围
+        // localSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);//
+        // 设置要使菜单滑动，触碰屏幕的范围
         // // 设置了这个会获取不到菜单里面的焦点，所以先注释掉
         // localSlidingMenu.setTouchModeBehind(SlidingMenu.TOUCHMODE_MARGIN);
 
@@ -62,14 +65,16 @@ public class DrawerView implements OnClickListener {
         localSlidingMenu.setSecondaryShadowDrawable(R.drawable.shadowright);
         localSlidingMenu.setTouchmodeMarginThreshold(0);
 
-
         localSlidingMenu.setOnOpenListener(new OnOpenListener() {
 
             @Override
             public void onOpen() {
                 // TODO Auto-generated method stub
-                updateLoginStatus(QQAccountManager.getInstance(mActivity.getApplicationContext())
-                        .isLogin());
+                if (MainApp.sAccountManager != null && MainApp.sAccountManager.isLogin()) {
+                    updateLoginStatus(true);
+                } else {
+                    updateLoginStatus(false);
+                }
             }
         });
 
@@ -119,7 +124,6 @@ public class DrawerView implements OnClickListener {
 
     public void showLeftMenu(boolean bool) {
 
-        // updateLoginStatus(QQAccountManager.getInstance(activity.getApplicationContext()).isLogin());
         localSlidingMenu.showMenu(bool);
     }
 
@@ -135,13 +139,12 @@ public class DrawerView implements OnClickListener {
         return localSlidingMenu.isMenuShowing();
     }
 
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.left_login_fl:
 
-                if (QQAccountManager.getInstance(mActivity.getApplicationContext()).isLogin()) {
+                if (MainApp.sAccountManager != null && MainApp.sAccountManager.isLogin()) {
 
                     Log.e("lmf", ">>>>>>>>>>login>>>>>>>>>>>");
                     mActivity.startActivity(new Intent(mActivity, PersonInfoActivity.class));
@@ -161,18 +164,22 @@ public class DrawerView implements OnClickListener {
                 break;
             case R.id.left_btn2:
                 Log.e("lmf", ">>>>>>>>>>left_btn2>>>>>>>>>>>");
-                // mContext.startActivity(new Intent(mContext, TestActivity.class));
-                // mContext.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                mActivity.startActivity(new Intent(mActivity, SettingsActivity.class));
+                mActivity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 break;
             case R.id.left_btn3:
                 Log.e("lmf", ">>>>>>>>>>left_btn3>>>>>>>>>>>");
-                // mContext.startActivity(new Intent(activity, TestActivity.class));
-                // mContext.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                // mContext.startActivity(new Intent(activity,
+                // TestActivity.class));
+                // mContext.overridePendingTransition(R.anim.slide_in_right,
+                // R.anim.slide_out_left);
                 break;
             case R.id.right_btn1:
                 Log.e("lmf", ">>>>>>>>>>right_btn1>>>>>>>>>>>");
-                // activity.startActivity(new Intent(activity, TestActivity.class));
-                // activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                // activity.startActivity(new Intent(activity,
+                // TestActivity.class));
+                // activity.overridePendingTransition(R.anim.slide_in_right,
+                // R.anim.slide_out_left);
                 break;
             case R.id.right_btn2:
                 Log.e("lmf", ">>>>>>>>>>right_btn1>>>>>>>>>>>");
@@ -180,7 +187,6 @@ public class DrawerView implements OnClickListener {
                 // TestActivity.class));
                 // activity.overridePendingTransition(R.anim.slide_in_right,
                 // R.anim.slide_out_left);
-
 
                 break;
 
@@ -199,28 +205,27 @@ public class DrawerView implements OnClickListener {
         }
     }
 
-
     public void loadPersonData(PersonInfo person) {
 
         leftLoginInfoTitleTv.setText(person.getName());
         leftLoginInfoContentTv.setText(person.getDesc());
 
     }
-    
+
     public void loadPersonIcon(Bitmap bitmap) {
         leftLoginInfoIconIv.setImageBitmap(bitmap);
-        
+
     }
 
     public void loadPersonIcon(byte[] data) {
         Log.e("lmf", "loadPersonIcon>>>>>>>>>" + data);
-        if (data == null || data.length == 0) return;
+        if (data == null || data.length == 0)
+            return;
         Bitmap bitmap = BaseUtil.bytes2Bimap(data);
-        if (bitmap == null) return;
+        if (bitmap == null)
+            return;
         leftLoginInfoIconIv.setImageBitmap(bitmap);
 
     }
-
-
 
 }

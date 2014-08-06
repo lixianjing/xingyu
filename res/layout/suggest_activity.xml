@@ -15,7 +15,7 @@
         android:id="@+id/add_ll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/test_head"
+        android:layout_below="@id/add_head"
         android:background="#FF112211"
         android:orientation="horizontal" >
 

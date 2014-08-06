@@ -62,7 +62,7 @@ public class Configs {
 
     public static final int TYPE_DEFAULT = 0;
     public static final int TYPE_QQ = 1;
-    public static final int TYPE_weibo = 2;
+    public static final int TYPE_WEIBO = 2;
 
     public static final int INFO_STATUS_DEFAULT = 0;
     public static final int INFO_STATUS_CUSTOM = 1;

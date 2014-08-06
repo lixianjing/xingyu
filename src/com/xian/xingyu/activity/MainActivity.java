@@ -1,6 +1,7 @@
 
 package com.xian.xingyu.activity;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -30,12 +31,16 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.xian.xingyu.MainApp;
 import com.xian.xingyu.R;
 import com.xian.xingyu.bean.PersonInfo;
+import com.xian.xingyu.db.DBInfo;
 import com.xian.xingyu.db.DBManager;
 import com.xian.xingyu.fragment.PrivateFragment;
 import com.xian.xingyu.fragment.PublicFragment;
 import com.xian.xingyu.login.QQAccountManager;
+import com.xian.xingyu.login.WBAccountManager;
+import com.xian.xingyu.util.BaseUtil;
 import com.xian.xingyu.util.Configs;
 import com.xian.xingyu.view.DrawerView;
 import com.xian.xingyu.view.LoadingDialog;
@@ -82,7 +87,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 
     private LoginDialog dialogLogin;
     private LoadingDialog dialogLoading;
-    private QQAccountManager mQQManager;
 
     private final Handler mHandler = new Handler() {
 
@@ -98,13 +102,28 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                     break;
                 case MSG_LOGIN_QQ:
 
-                    mQQManager.login(MainActivity.this);
+                    if (MainApp.sAccountManager != null) {
+                        MainApp.sAccountManager.release();
+                        MainApp.sAccountManager = null;
+                    }
+                    MainApp.sAccountManager = QQAccountManager
+                            .getInstance(mContext.getApplicationContext());
+                    MainApp.sAccountManager.setHanlder(mHandler);
 
+                    MainApp.sAccountManager.login(MainActivity.this);
 
                     break;
                 case MSG_LOGIN_WEIBO:
 
-                    mQQManager.login(MainActivity.this);
+                    if (MainApp.sAccountManager != null) {
+                        MainApp.sAccountManager.release();
+                        MainApp.sAccountManager = null;
+                    }
+                    MainApp.sAccountManager = WBAccountManager
+                            .getInstance(mContext.getApplicationContext());
+                    MainApp.sAccountManager.setHanlder(mHandler);
+
+                    MainApp.sAccountManager.login(MainActivity.this);
                     break;
 
                 case MSG_LOGIN_CANCEL:
@@ -115,20 +134,20 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                     break;
                 case MSG_LOGIN_SUCCESS:
                     showDialogLoading(true);
-                    mQQManager.getUserInfo();
+                    MainApp.sAccountManager.getPersonalInfo();
 
                     break;
 
                 case MSG_LOGIN_GET_INFO_CANCEL:
                     Log.e("lmf", ">>>login>>>>>>>>>MSG_LOGIN_GET_INFO_CANCEL>>>>>>>");
                     showDialogLoading(false);
-                    mQQManager.logout();
+                    MainApp.sAccountManager.logout();
 
                     break;
                 case MSG_LOGIN_GET_INFO_ERROR:
                     Log.e("lmf", ">>>login>>>>>>>>>MSG_LOGIN_GET_INFO_ERROR>>>>>>>");
                     showDialogLoading(false);
-                    mQQManager.logout();
+                    MainApp.sAccountManager.logout();
                     break;
                 case MSG_LOGIN_GET_INFO_SUCCESS:
                     final PersonInfo info = (PersonInfo) msg.obj;
@@ -139,7 +158,28 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                         @Override
                         public void run() {
                             // TODO Auto-generated method stub
-                            mQQManager.getUserThumbIcon(info.getIconThumbUri());
+                            if (info.getIconThumbUri() != null) {
+                                final byte[] data =
+                                        BaseUtil.getImageData(mContext, info.getIconThumbUri());
+                                if (data != null && data.length > 0) {
+                                    ContentValues values = new ContentValues();
+                                    values.put(DBInfo.Personal.ICON_THUMB, data);
+
+                                    Bitmap bitmap = BaseUtil.bytes2Bimap(data);
+                                    if (bitmap != null) {
+                                        mDBManager.updatePersonal(values);
+
+                                        Message message = mHandler
+                                                .obtainMessage(MainActivity.MSG_LOGIN_GET_ICON_SUCCESS);
+                                        message.obj = bitmap;
+                                        message.sendToTarget();
+                                        return;
+                                    }
+
+                                }
+
+                            }
+                            mHandler.sendEmptyMessage(MainActivity.MSG_LOGIN_GET_ICON_ERROR);
                         }
                     }).start();
                     Log.e("lmf",
@@ -196,9 +236,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         mFragmentManager = getSupportFragmentManager();
         setContentView(R.layout.main);
         mDBManager = DBManager.getInstance(mContext);
-
-        mQQManager = QQAccountManager.getInstance(mContext);
-        mQQManager.setHanlder(mHandler);
 
         initView();
         initSlidingMenu();
@@ -293,18 +330,37 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         SharedPreferences pref = Configs.getInstance(mContext).getSharedPreferences();
         String key = pref.getString(Configs.KEY, "");
         String token = pref.getString(Configs.TOKEN, "");
+        long authTime = pref.getLong(Configs.AUTH_TIME, 0);
+        int type = pref.getInt(Configs.TYPE, Configs.TYPE_DEFAULT);
+        int infoStatus = pref.getInt(Configs.INFO_STATUS, Configs.INFO_STATUS_DEFAULT);
 
         if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(token)) {
+            if (MainApp.sAccountManager != null) {
+                MainApp.sAccountManager.release();
+                MainApp.sAccountManager = null;
+            }
+            if (type == Configs.TYPE_QQ) {
+                MainApp.sAccountManager = QQAccountManager
+                        .getInstance(mContext.getApplicationContext());
+
+            } else if (type == Configs.TYPE_WEIBO) {
+                MainApp.sAccountManager = WBAccountManager
+                        .getInstance(mContext.getApplicationContext());
+            }
+            MainApp.sAccountManager.setHanlder(mHandler);
+            MainApp.sAccountManager.loadAccount(key, token, String.valueOf(authTime));
+
+        }
+
+        if (MainApp.sAccountManager != null && MainApp.sAccountManager.isLogin()) {
             PersonInfo personal = mDBManager.getPersonal();
             if (personal != null && !TextUtils.isEmpty(personal.getName())) {
-                QQAccountManager.getInstance(this.getApplicationContext()).loadAccount(key, token,
-                        (pref.getLong(Configs.AUTH_TIME, 0) - System.currentTimeMillis() / 1000));
 
                 drawerView.loadPersonData(personal);
                 drawerView.loadPersonIcon(personal.getIconThumb());
 
             } else {
-                QQAccountManager.getInstance(this.getApplicationContext()).logout();
+                MainApp.sAccountManager.getPersonalInfo();
             }
         }
 

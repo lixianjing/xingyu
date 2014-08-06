@@ -1,5 +1,11 @@
 package com.xian.xingyu.util;
 
+import android.content.Context;
+import android.content.SharedPreferences.Editor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
+
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -7,11 +13,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Log;
 
 public class BaseUtil {
 
@@ -128,5 +129,15 @@ public class BaseUtil {
         } else {
             return null;
         }
+    }
+
+    public static void cleanLoginConfig(Configs config) {
+        Editor editor = config.getEditor();
+        editor.putString(Configs.KEY, "");
+        editor.putString(Configs.TOKEN, "");
+        editor.putLong(Configs.AUTH_TIME, 0);
+        editor.putInt(Configs.TYPE, Configs.TYPE_DEFAULT);
+        editor.putInt(Configs.INFO_STATUS, Configs.INFO_STATUS_DEFAULT);
+        editor.commit();
     }
 }

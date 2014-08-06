@@ -1,6 +1,7 @@
 package com.xian.xingyu.login;
 
 import android.app.Activity;
+import android.os.Handler;
 
 
 
@@ -16,8 +17,9 @@ public interface IAccountManager {
 
     public void getPersonalInfo();
 
-    public void getType();
+    public int getType();
+
+    public void setHanlder(Handler handler);
 
     public void release();
-
 }
