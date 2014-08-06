@@ -4,7 +4,6 @@ import android.app.Activity;
 
 
 
-
 public interface IAccountManager {
 
     public boolean isLogin();
@@ -13,8 +12,12 @@ public interface IAccountManager {
 
     public void logout();
 
+    public void loadAccount(String uid, String accessToken, String expiresIn);
 
+    public void getPersonalInfo();
 
+    public void getType();
 
+    public void release();
 
 }
