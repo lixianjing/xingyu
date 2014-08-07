@@ -1,11 +1,13 @@
-
 package com.xian.xingyu.login;
+
+import java.text.SimpleDateFormat;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -22,11 +24,11 @@ import com.sina.weibo.sdk.openapi.UsersAPI;
 import com.sina.weibo.sdk.openapi.models.User;
 import com.sina.weibo.sdk.utils.LogUtil;
 import com.xian.xingyu.activity.MainActivity;
+import com.xian.xingyu.bean.PersonInfo;
+import com.xian.xingyu.db.DBInfo;
 import com.xian.xingyu.db.DBManager;
 import com.xian.xingyu.util.BaseUtil;
 import com.xian.xingyu.util.Configs;
-
-import java.text.SimpleDateFormat;
 
 public class WBAccountManager implements IAccountManager {
 
@@ -47,17 +49,15 @@ public class WBAccountManager implements IAccountManager {
     /**
      * Scope 是 OAuth2.0 授权机制中 authorize 接口的一个参数。通过 Scope，平台将开放更多的微博
      * 核心功能给开发者，同时也加强用户隐私保护，提升了用户体验，用户在新 OAuth2.0 授权页中有权利 选择赋予应用的功能。
-     * 我们通过新浪微博开放平台-->管理中心-->我的应用-->接口管理处，能看到我们目前已有哪些接口的 使用权限，高级权限需要进行申请。 目前
-     * Scope 支持传入多个 Scope 权限，用逗号分隔。 有关哪些 OpenAPI
-     * 需要权限申请，请查看：http://open.weibo.com/wiki/%E5%BE%AE%E5%8D%9AAPI 关于 Scope
+     * 我们通过新浪微博开放平台-->管理中心-->我的应用-->接口管理处，能看到我们目前已有哪些接口的 使用权限，高级权限需要进行申请。 目前 Scope 支持传入多个 Scope
+     * 权限，用逗号分隔。 有关哪些 OpenAPI 需要权限申请，请查看：http://open.weibo.com/wiki/%E5%BE%AE%E5%8D%9AAPI 关于 Scope
      * 概念及注意事项，请查看：http://open.weibo.com/wiki/Scope
      */
     public static final String SCOPE = "email,direct_messages_read,direct_messages_write,"
             + "friendships_groups_read,friendships_groups_write,statuses_to_me_read,"
             + "follow_app_official_microblog," + "invitation_write";
     /**
-     * WeiboSDKDemo 程序的 APP_SECRET。 请注意：请务必妥善保管好自己的
-     * APP_SECRET，不要直接暴露在程序中，此处仅作为一个DEMO来演示。
+     * WeiboSDKDemo 程序的 APP_SECRET。 请注意：请务必妥善保管好自己的 APP_SECRET，不要直接暴露在程序中，此处仅作为一个DEMO来演示。
      */
     private static final String WEIBO_DEMO_APP_SECRET = "4e47e691a516afad0fc490e05ff70ee5";
 
@@ -96,7 +96,7 @@ public class WBAccountManager implements IAccountManager {
         this.mContext = context;
         mDBManager = DBManager.getInstance(context.getApplicationContext());
         mConfigs = Configs.getInstance(context.getApplicationContext());
-        mWeiboAuth = new WeiboAuth(context.getApplicationContext(), APP_KEY, REDIRECT_URL, SCOPE);
+        mWeiboAuth = new WeiboAuth(context, APP_KEY, REDIRECT_URL, SCOPE);
     }
 
     @Override
@@ -168,13 +168,14 @@ public class WBAccountManager implements IAccountManager {
         });
 
         BaseUtil.cleanLoginConfig(mConfigs);
-
+        mDBManager.updatePersonal(new PersonInfo());
     }
 
     @Override
     public void loadAccount(String uid, String accessToken, String expiresIn) {
         // TODO Auto-generated method stub
         mAccessToken = new Oauth2AccessToken(accessToken, expiresIn);
+        mAccessToken.setUid(uid);
 
     }
 
@@ -193,27 +194,26 @@ public class WBAccountManager implements IAccountManager {
                     if (user != null) {
 
                         Log.e("lmf", ">>>>>>>>>user>>>>>>>>>>>>" + user);
-                        // PersonInfo personal = new PersonInfo();
-                        // personal.setIcon(null);
-                        // personal.setIconUri(null);
-                        // personal.setIconThumb(null);
-                        // personal.setIconThumbUri(json.getString("figureurl_qq_2"));
-                        // personal.setName(json.getString("nickname"));
-                        // personal.setDesc(json.getString("msg"));
-                        // personal.setGender(DBInfo.Personal.GENDER_NONE);
-                        // personal.setLocal(json.getString("province") + "," +
-                        // json.getString("city"));
-                        // personal.setBirthYear(1990);
-                        // personal.setBirthMonth(1);
-                        // personal.setBirthDay(1);
-                        // personal.setBirthType(DBInfo.Personal.BIRTH_TYPE_GREGORIAN);
-                        //
-                        // mDBManager.updatePersonal(personal);
-                        //
-                        // Message message =
-                        // mHanlder.obtainMessage(MainActivity.MSG_LOGIN_GET_INFO_SUCCESS);
-                        // message.obj = personal;
-                        // message.sendToTarget();
+                        PersonInfo personal = new PersonInfo();
+                        personal.setIcon(null);
+                        personal.setIconUri(null);
+                        personal.setIconThumb(null);
+                        personal.setIconThumbUri(user.profile_image_url);
+                        personal.setName(user.screen_name);
+                        personal.setDesc(user.description);
+                        personal.setGender(DBInfo.Personal.GENDER_NONE);
+                        personal.setLocal(user.location);
+                        personal.setBirthYear(1990);
+                        personal.setBirthMonth(1);
+                        personal.setBirthDay(1);
+                        personal.setBirthType(DBInfo.Personal.BIRTH_TYPE_GREGORIAN);
+
+                        mDBManager.updatePersonal(personal);
+
+                        Message message =
+                                mHandler.obtainMessage(MainActivity.MSG_LOGIN_GET_INFO_SUCCESS);
+                        message.obj = personal;
+                        message.sendToTarget();
                         return;
                     }
                 }
@@ -236,7 +236,7 @@ public class WBAccountManager implements IAccountManager {
     }
 
     @Override
-    public void setHanlder(Handler hanlder) {
+    public void setHandler(Handler hanlder) {
         this.mHandler = hanlder;
     }
 
@@ -244,8 +244,7 @@ public class WBAccountManager implements IAccountManager {
      * 异步获取 Token。
      *
      * @param authCode 授权 Code，该 Code 是一次性的，只能被获取一次 Token
-     * @param appSecret 应用程序的 APP_SECRET，请务必妥善保管好自己的 APP_SECRET，
-     *            不要直接暴露在程序中，此处仅作为一个DEMO来演示。
+     * @param appSecret 应用程序的 APP_SECRET，请务必妥善保管好自己的 APP_SECRET， 不要直接暴露在程序中，此处仅作为一个DEMO来演示。
      */
     public void fetchTokenAsync(String authCode, String appSecret) {
 

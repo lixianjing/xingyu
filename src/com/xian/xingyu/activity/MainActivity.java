@@ -1,5 +1,7 @@
-
 package com.xian.xingyu.activity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -45,9 +47,6 @@ import com.xian.xingyu.util.Configs;
 import com.xian.xingyu.view.DrawerView;
 import com.xian.xingyu.view.LoadingDialog;
 import com.xian.xingyu.view.LoginDialog;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends FragmentActivity implements OnClickListener {
 
@@ -106,9 +105,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                         MainApp.sAccountManager.release();
                         MainApp.sAccountManager = null;
                     }
-                    MainApp.sAccountManager = QQAccountManager
-                            .getInstance(mContext.getApplicationContext());
-                    MainApp.sAccountManager.setHanlder(mHandler);
+                    MainApp.sAccountManager = QQAccountManager.getInstance(mContext);
+                    MainApp.sAccountManager.setHandler(mHandler);
 
                     MainApp.sAccountManager.login(MainActivity.this);
 
@@ -119,9 +117,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                         MainApp.sAccountManager.release();
                         MainApp.sAccountManager = null;
                     }
-                    MainApp.sAccountManager = WBAccountManager
-                            .getInstance(mContext.getApplicationContext());
-                    MainApp.sAccountManager.setHanlder(mHandler);
+                    MainApp.sAccountManager = WBAccountManager.getInstance(mContext);
+                    MainApp.sAccountManager.setHandler(mHandler);
 
                     MainApp.sAccountManager.login(MainActivity.this);
                     break;
@@ -169,8 +166,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                                     if (bitmap != null) {
                                         mDBManager.updatePersonal(values);
 
-                                        Message message = mHandler
-                                                .obtainMessage(MainActivity.MSG_LOGIN_GET_ICON_SUCCESS);
+                                        Message message =
+                                                mHandler.obtainMessage(MainActivity.MSG_LOGIN_GET_ICON_SUCCESS);
                                         message.obj = bitmap;
                                         message.sendToTarget();
                                         return;
@@ -191,8 +188,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                     showDialogLoading(false);
                     Bitmap bitmap = (Bitmap) msg.obj;
                     drawerView.loadPersonIcon(bitmap);
-                    Log.e("lmf",
-                            ">>>login>>>>>>>>>MSG_LOGIN_GET_INFO_SUCCESS>>>>>>>" + bitmap);
+                    Log.e("lmf", ">>>login>>>>>>>>>MSG_LOGIN_GET_INFO_SUCCESS>>>>>>>" + bitmap);
                     break;
                 case MSG_LOGIN_GET_ICON_ERROR:
                     showDialogLoading(false);
@@ -207,10 +203,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     };
 
     public void showDialogLogin(boolean bool) {
-        if (dialogLogin == null)
-            dialogLogin = new LoginDialog(MainActivity.this, mHandler);
-        if (dialogLogin.isShowing() && bool)
-            return;
+        if (dialogLogin == null) dialogLogin = new LoginDialog(MainActivity.this, mHandler);
+        if (dialogLogin.isShowing() && bool) return;
         if (bool)
             dialogLogin.show();
         else
@@ -219,10 +213,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 
     public void showDialogLoading(boolean bool) {
         Log.e("lmf", ">>>>>>>>>>>showDialogLoading>>>>>");
-        if (dialogLoading == null)
-            dialogLoading = new LoadingDialog(MainActivity.this);
-        if (dialogLoading.isShowing() && bool)
-            return;
+        if (dialogLoading == null) dialogLoading = new LoadingDialog(MainActivity.this);
+        if (dialogLoading.isShowing() && bool) return;
         if (bool)
             dialogLoading.show();
         else
@@ -340,14 +332,12 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                 MainApp.sAccountManager = null;
             }
             if (type == Configs.TYPE_QQ) {
-                MainApp.sAccountManager = QQAccountManager
-                        .getInstance(mContext.getApplicationContext());
+                MainApp.sAccountManager = QQAccountManager.getInstance(mContext);
 
             } else if (type == Configs.TYPE_WEIBO) {
-                MainApp.sAccountManager = WBAccountManager
-                        .getInstance(mContext.getApplicationContext());
+                MainApp.sAccountManager = WBAccountManager.getInstance(mContext);
             }
-            MainApp.sAccountManager.setHanlder(mHandler);
+            MainApp.sAccountManager.setHandler(mHandler);
             MainApp.sAccountManager.loadAccount(key, token, String.valueOf(authTime));
 
         }
@@ -468,23 +458,19 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     public class MyPageListener implements OnPageChangeListener {
 
         @Override
-        public void onPageScrollStateChanged(int arg0) {
-        }
+        public void onPageScrollStateChanged(int arg0) {}
 
         @Override
-        public void onPageScrolled(int arg0, float arg1, int arg2) {
-        }
+        public void onPageScrolled(int arg0, float arg1, int arg2) {}
 
         @Override
         public void onPageSelected(int arg0) {
             int x = moveX * 2 + width; // 从第一个到第二个view，粗的下划线的偏移量
             /**
-             * TranslateAnimation(float fromXDelta, float toXDelta, float
-             * fromYDelta, float toYDelta) 　 float
-             * fromXDelta:这个参数表示动画开始的点离当前View X坐标上的差值； float toXDelta,
-             * 这个参数表示动画结束的点离当前View X坐标上的差值； float fromYDelta,
-             * 这个参数表示动画开始的点离当前View Y坐标上的差值； float toYDelta)这个参数表示动画开始的点离当前View
-             * Y坐标上的差值；
+             * TranslateAnimation(float fromXDelta, float toXDelta, float fromYDelta, float
+             * toYDelta) 　 float fromXDelta:这个参数表示动画开始的点离当前View X坐标上的差值； float toXDelta,
+             * 这个参数表示动画结束的点离当前View X坐标上的差值； float fromYDelta, 这个参数表示动画开始的点离当前View Y坐标上的差值； float
+             * toYDelta)这个参数表示动画开始的点离当前View Y坐标上的差值；
              */
             Log.v("index的值为:", index + "");
             Log.v("arg0的值为:", arg0 + "");

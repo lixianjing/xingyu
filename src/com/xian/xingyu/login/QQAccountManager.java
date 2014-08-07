@@ -1,6 +1,9 @@
 
 package com.xian.xingyu.login;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences.Editor;
@@ -18,9 +21,6 @@ import com.xian.xingyu.db.DBInfo;
 import com.xian.xingyu.db.DBManager;
 import com.xian.xingyu.util.BaseUtil;
 import com.xian.xingyu.util.Configs;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class QQAccountManager implements IAccountManager {
 
@@ -122,7 +122,7 @@ public class QQAccountManager implements IAccountManager {
         mTencent.logout(mContext);
 
         BaseUtil.cleanLoginConfig(mConfigs);
-
+        mDBManager.updatePersonal(new PersonInfo());
     }
 
     @Override
@@ -200,7 +200,7 @@ public class QQAccountManager implements IAccountManager {
     }
 
     @Override
-    public void setHanlder(Handler mHanlder) {
+    public void setHandler(Handler mHanlder) {
         this.mHandler = mHanlder;
     }
 

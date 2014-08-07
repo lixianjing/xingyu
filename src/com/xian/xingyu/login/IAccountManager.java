@@ -19,7 +19,7 @@ public interface IAccountManager {
 
     public int getType();
 
-    public void setHanlder(Handler handler);
+    public void setHandler(Handler handler);
 
     public void release();
 }
