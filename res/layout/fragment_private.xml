@@ -4,8 +4,23 @@
     android:layout_height="match_parent" >
 
     <TextView
-        android:text="fragment_private"
+        android:id="@+id/pri_tv"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="10dip"
+        android:text="fragment_private" />
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/pri_srl"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <ListView
+            android:id="@+id/pri_lv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+        </ListView>
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </FrameLayout>

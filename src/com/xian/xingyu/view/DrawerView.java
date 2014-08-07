@@ -1,4 +1,3 @@
-
 package com.xian.xingyu.view;
 
 import android.app.Activity;
@@ -166,6 +165,7 @@ public class DrawerView implements OnClickListener {
                 Log.e("lmf", ">>>>>>>>>>left_btn2>>>>>>>>>>>");
                 mActivity.startActivity(new Intent(mActivity, SettingsActivity.class));
                 mActivity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+
                 break;
             case R.id.left_btn3:
                 Log.e("lmf", ">>>>>>>>>>left_btn3>>>>>>>>>>>");
@@ -219,11 +219,9 @@ public class DrawerView implements OnClickListener {
 
     public void loadPersonIcon(byte[] data) {
         Log.e("lmf", "loadPersonIcon>>>>>>>>>" + data);
-        if (data == null || data.length == 0)
-            return;
+        if (data == null || data.length == 0) return;
         Bitmap bitmap = BaseUtil.bytes2Bimap(data);
-        if (bitmap == null)
-            return;
+        if (bitmap == null) return;
         leftLoginInfoIconIv.setImageBitmap(bitmap);
 
     }

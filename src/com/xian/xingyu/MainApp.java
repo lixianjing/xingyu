@@ -19,5 +19,8 @@ public class MainApp extends Application {
     }
 
 
+    public static boolean isLogin() {
+        return (MainApp.sAccountManager != null && MainApp.sAccountManager.isLogin());
+    }
 
 }

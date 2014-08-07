@@ -198,7 +198,7 @@ public class WBAccountManager implements IAccountManager {
                         personal.setIcon(null);
                         personal.setIconUri(null);
                         personal.setIconThumb(null);
-                        personal.setIconThumbUri(user.profile_image_url);
+                        personal.setIconThumbUri(user.avatar_large);
                         personal.setName(user.screen_name);
                         personal.setDesc(user.description);
                         personal.setGender(DBInfo.Personal.GENDER_NONE);

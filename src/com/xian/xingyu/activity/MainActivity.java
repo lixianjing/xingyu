@@ -68,7 +68,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     private FragmentManager mFragmentManager;
     private Context mContext;
 
-    private Fragment mPublicFragment, mPrivateFragment;
+    private PublicFragment mPublicFragment;
+    private PrivateFragment mPrivateFragment;
     private List<Fragment> mFragmentList;
 
     private TextView mTitleLeftTv, mTitleRightTv;
@@ -352,6 +353,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
             } else {
                 MainApp.sAccountManager.getPersonalInfo();
             }
+        } else {
+
         }
 
     }
@@ -391,44 +394,28 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         // TODO Auto-generated method stub
         switch (arg0.getId()) {
             case R.id.head_viewpage_left_tv:
-                if (drawerView.isMenuShowing()) {
-                    drawerView.showContent();
-                } else {
-                    mViewPager.setCurrentItem(0);
-                }
+                mViewPager.setCurrentItem(0);
                 break;
             case R.id.head_viewpage_right_tv:
-                if (drawerView.isMenuShowing()) {
-                    drawerView.showContent();
-                } else {
-                    mViewPager.setCurrentItem(1);
-                }
+                mViewPager.setCurrentItem(1);
                 break;
 
             case R.id.tab_left_rl:
-                if (drawerView.isMenuShowing()) {
-                    drawerView.showContent();
-                } else {
-                    drawerView.showLeftMenu();
-                }
+                drawerView.showLeftMenu();
 
                 break;
             case R.id.tab_middle_rl:
-                if (drawerView.isMenuShowing()) {
-                    drawerView.showContent();
-                } else {
 
-                    Intent intent = new Intent(this, AddActivity.class);
-                    mContext.startActivity(intent);
-                    this.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                    Log.e("lmf", ">>>>>>>>>>>>>>edit>>>>>>>>>");
-                }
+                Intent intent = new Intent(this, AddActivity.class);
+                mContext.startActivity(intent);
+                // this.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                Log.e("lmf", ">>>>>>>>>>>>>>edit>>>>>>>>>");
                 break;
             case R.id.tab_right_rl:
-                if (drawerView.isMenuShowing()) {
-                    drawerView.showContent();
-                } else {
+                if (MainApp.sAccountManager != null && MainApp.sAccountManager.isLogin()) {
                     drawerView.showRightMenu();
+                } else {
+                    showDialogLogin(true);
                 }
                 break;
 
@@ -465,6 +452,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 
         @Override
         public void onPageSelected(int arg0) {
+            Log.e("lmf", ">>>>>>>>onPageSelected>>>>>>>>>" + arg0);
             int x = moveX * 2 + width; // 从第一个到第二个view，粗的下划线的偏移量
             /**
              * TranslateAnimation(float fromXDelta, float toXDelta, float fromYDelta, float

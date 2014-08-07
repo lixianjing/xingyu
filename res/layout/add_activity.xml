@@ -5,24 +5,92 @@
     android:orientation="vertical" >
 
     <com.xian.xingyu.view.CommonHeadView
-        android:id="@+id/add_head"
+        android:id="@+id/commonhead"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0" >
     </com.xian.xingyu.view.CommonHeadView>
 
     <LinearLayout
-        android:id="@+id/test_ll"
+        android:id="@+id/content_ll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:background="#FF112211"
-        android:orientation="horizontal" >
+        android:orientation="vertical" >
 
-        <TextView
-            android:layout_width="wrap_content"
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1" >
+
+            <LinearLayout
+                android:id="@+id/add_edit_content_ll"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="#FF112211"
+                android:orientation="vertical" >
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:orientation="horizontal" >
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="拍照" >
+                    </Button>
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="照片" >
+                    </Button>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="私密" />
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="添加应用" />
+            android:layout_weight="0"
+            android:orientation="horizontal" >
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="拍照" >
+            </Button>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="照片" >
+            </Button>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="私密" />
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>
