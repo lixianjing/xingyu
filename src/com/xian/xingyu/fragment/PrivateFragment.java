@@ -1,9 +1,8 @@
+
 package com.xian.xingyu.fragment;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -19,19 +18,23 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.xian.xingyu.MainApp;
 import com.xian.xingyu.R;
+import com.xian.xingyu.activity.AddActivity;
 import com.xian.xingyu.activity.MainActivity;
 import com.xian.xingyu.adapter.PublicAdapter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PrivateFragment extends Fragment
         implements
-            OnClickListener,
-            SwipeRefreshLayout.OnRefreshListener {
+        OnClickListener,
+        SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = "PublicFragment";
     public static final int TYPE_LOAD_FORWARD = 0;
     public static final int TYPE_LOAD_BACKWARD = 1;
-
 
     private MainActivity mActivity;
     private SwipeRefreshLayout mSwipeLayout;
@@ -42,7 +45,6 @@ public class PrivateFragment extends Fragment
     private LinearLayout mListBtmProgressLayout;
 
     private List<Integer> mDataList;
-
 
     private PublicAdapter mPublicAdapter;
 
@@ -56,7 +58,6 @@ public class PrivateFragment extends Fragment
         Log.e(TAG, ">>>onCreateView>>>>>>>>>>>>>");
         View view = inflater.inflate(R.layout.fragment_private, null);
 
-
         mTextView = (TextView) view.findViewById(R.id.pri_tv);
 
         mSwipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.pri_srl);
@@ -64,7 +65,6 @@ public class PrivateFragment extends Fragment
         mSwipeLayout.setColorScheme(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light, android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
-
 
         initTestData();
 
@@ -84,7 +84,8 @@ public class PrivateFragment extends Fragment
             @Override
             public void onClick(View arg0) {
                 // TODO Auto-generated method stub
-                if (mListBtmProgressLayout.getVisibility() == View.VISIBLE) return;
+                if (mListBtmProgressLayout.getVisibility() == View.VISIBLE)
+                    return;
                 mListBtmTv.setVisibility(View.GONE);
                 mListBtmProgressLayout.setVisibility(View.VISIBLE);
                 new LoadDataAsyncTask(TYPE_LOAD_BACKWARD).execute(mDataList.get(mDataList.size() - 1));
@@ -93,11 +94,17 @@ public class PrivateFragment extends Fragment
         });
         mListView.addFooterView(mListBtmRl);
 
-
         mPublicAdapter = new PublicAdapter(getActivity());
         mPublicAdapter.setList(mDataList);
         mListView.setAdapter(mPublicAdapter);
 
+        mTextView.setOnClickListener(this);
+        
+        if (MainApp.isLogin()) {
+            showData();
+        } else {
+            notLogin();
+        }
 
         return view;
     }
@@ -109,7 +116,6 @@ public class PrivateFragment extends Fragment
         }
     }
 
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -118,6 +124,20 @@ public class PrivateFragment extends Fragment
     @Override
     public void onClick(View v) {
         // TODO Auto-generated method stub
+        switch (v.getId()) {
+            case R.id.pri_tv:
+                if (MainApp.isLogin()) {
+                    Intent intent = new Intent(mActivity, AddActivity.class);
+                    mActivity.startActivity(intent);
+                } else {
+
+                    mActivity.showDialogLogin(true);
+                }
+                break;
+
+            default:
+                break;
+        }
     }
 
     @Override
@@ -155,8 +175,6 @@ public class PrivateFragment extends Fragment
         Log.e(TAG, ">>>onStop>>>>>>>>>>>>>");
     }
 
-
-
     @Override
     public void onAttach(Activity activity) {
         // TODO Auto-generated method stub
@@ -180,23 +198,24 @@ public class PrivateFragment extends Fragment
 
     }
 
-
-    public void showText(String text) {
-        mTextView.setText(text);
+    public void notLogin() {
+        mTextView.setText("你还没有登陆哦");
         mTextView.setVisibility(View.VISIBLE);
         mSwipeLayout.setVisibility(View.GONE);
     }
 
     public void showData() {
-        mSwipeLayout.setVisibility(View.VISIBLE);
-        mTextView.setVisibility(View.GONE);
+        mTextView.setText("你还没有秘密哦，赶紧加入吧");
+
+        mTextView.setVisibility(View.VISIBLE);
+        mSwipeLayout.setVisibility(View.GONE);
+
+        // mSwipeLayout.setVisibility(View.VISIBLE);
+        // mTextView.setVisibility(View.GONE);
 
     }
 
-
-
     private class LoadDataAsyncTask extends AsyncTask<Integer, Void, List<Integer>> {
-
 
         private final int type;
 
@@ -208,7 +227,6 @@ public class PrivateFragment extends Fragment
         protected List<Integer> doInBackground(Integer... arg0) {
             // TODO Auto-generated method stub
 
-
             List<Integer> list = new ArrayList<Integer>();
 
             try {
@@ -217,7 +235,6 @@ public class PrivateFragment extends Fragment
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-
 
             if (type == TYPE_LOAD_FORWARD) {
                 for (int i = 11; i > 0; i--) {
@@ -237,7 +254,6 @@ public class PrivateFragment extends Fragment
             // TODO Auto-generated method stub
             super.onPostExecute(result);
 
-
             if (type == TYPE_LOAD_FORWARD) {
                 mDataList.addAll(0, result);
                 mSwipeLayout.setRefreshing(false);
@@ -252,7 +268,5 @@ public class PrivateFragment extends Fragment
         }
 
     }
-
-
 
 }

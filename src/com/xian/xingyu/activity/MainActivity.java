@@ -1,8 +1,5 @@
 package com.xian.xingyu.activity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -47,6 +44,9 @@ import com.xian.xingyu.util.Configs;
 import com.xian.xingyu.view.DrawerView;
 import com.xian.xingyu.view.LoadingDialog;
 import com.xian.xingyu.view.LoginDialog;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends FragmentActivity implements OnClickListener {
 
@@ -133,7 +133,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                 case MSG_LOGIN_SUCCESS:
                     showDialogLoading(true);
                     MainApp.sAccountManager.getPersonalInfo();
-
+                    mPrivateFragment.showData();
                     break;
 
                 case MSG_LOGIN_GET_INFO_CANCEL:
@@ -343,7 +343,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 
         }
 
-        if (MainApp.sAccountManager != null && MainApp.sAccountManager.isLogin()) {
+        if (MainApp.isLogin()) {
             PersonInfo personal = mDBManager.getPersonal();
             if (personal != null && !TextUtils.isEmpty(personal.getName())) {
 
@@ -354,7 +354,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                 MainApp.sAccountManager.getPersonalInfo();
             }
         } else {
-
         }
 
     }
@@ -468,6 +467,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
             animation.setFillAfter(true); // 设置动画停止在结束位置
             animation.setDuration(300); // 设置动画时间
             mPointIv.startAnimation(animation); // 启动动画
+
         }
     }
 
