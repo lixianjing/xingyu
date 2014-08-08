@@ -1,5 +1,8 @@
 package com.xian.xingyu.activity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -44,9 +47,6 @@ import com.xian.xingyu.util.Configs;
 import com.xian.xingyu.view.DrawerView;
 import com.xian.xingyu.view.LoadingDialog;
 import com.xian.xingyu.view.LoginDialog;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends FragmentActivity implements OnClickListener {
 
@@ -353,8 +353,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
             } else {
                 MainApp.sAccountManager.getPersonalInfo();
             }
-        } else {
-        }
+        } else {}
 
     }
 
@@ -405,13 +404,17 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                 break;
             case R.id.tab_middle_rl:
 
-                Intent intent = new Intent(this, AddActivity.class);
-                mContext.startActivity(intent);
-                // this.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                Log.e("lmf", ">>>>>>>>>>>>>>edit>>>>>>>>>");
+
+                if (MainApp.isLogin()) {
+                    Intent intent = new Intent(this, AddActivity.class);
+                    mContext.startActivity(intent);
+                    // this.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                } else {
+                    showDialogLogin(true);
+                }
                 break;
             case R.id.tab_right_rl:
-                if (MainApp.sAccountManager != null && MainApp.sAccountManager.isLogin()) {
+                if (MainApp.isLogin()) {
                     drawerView.showRightMenu();
                 } else {
                     showDialogLogin(true);

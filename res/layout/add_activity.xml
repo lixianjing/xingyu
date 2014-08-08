@@ -33,34 +33,21 @@
                 android:orientation="vertical" >
 
                 <EditText
+                    android:id="@+id/add_edit_et"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
                 <LinearLayout
+                    android:id="@+id/add_edit_ll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="0"
                     android:orientation="horizontal" >
 
-                    <Button
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="拍照" >
-                    </Button>
-
-                    <Button
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="照片" >
-                    </Button>
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="私密" />
+                    <ImageView
+                        android:id="@+id/add_edit_image1_iv"
+                        android:layout_width="72dip"
+                        android:layout_height="72dip" />
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>
@@ -72,6 +59,7 @@
             android:orientation="horizontal" >
 
             <Button
+                android:id="@+id/add_btm_camera_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -79,13 +67,15 @@
             </Button>
 
             <Button
+                android:id="@+id/add_btm_take_photo_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="照片" >
             </Button>
 
-            <TextView
+            <Button
+                android:id="@+id/add_btm_range_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
