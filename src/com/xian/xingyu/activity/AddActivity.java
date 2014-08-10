@@ -1,9 +1,7 @@
+
 package com.xian.xingyu.activity;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,31 +20,47 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.xian.xingyu.R;
+import com.xian.xingyu.adapter.AddAdapter;
 import com.xian.xingyu.base.BaseActivity;
+import com.xian.xingyu.util.BaseUtil;
+import com.xian.xingyu.view.AddGridView;
 import com.xian.xingyu.view.CommonHeadView;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class AddActivity extends BaseActivity implements OnClickListener {
 
     private static final String LOG_TAG = "lmf";
 
-    private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
+    private static final int RC_CAPTURE_IMAGE_BY_CAMERA = 101;
+    private static final int RC_CAPTURE_IMAGE_BY_PHOTO = 102;
     private Uri fileUri;
+
+    private Context mContext;
 
     private CommonHeadView mHeadView;
     private EditText mEditText;
     private Button mCameraBtn, mTakePhotoBtn, mRangeBtn;
     private LinearLayout mEditLl;
     private ImageView mEditImageIv;
+    private AddGridView mEditGv;
+    private AddAdapter mAddAdapter;
+
+    private List<Bitmap> mBitmapList;
 
     @Override
     protected void onCreate(Bundle arg0) {
         // TODO Auto-generated method stub
         super.onCreate(arg0);
         setContentView(R.layout.add_activity);
+        mContext = this;
+
         initTitle();
         initView();
-
 
     }
 
@@ -82,6 +97,8 @@ public class AddActivity extends BaseActivity implements OnClickListener {
 
         mEditImageIv = (ImageView) findViewById(R.id.add_edit_image1_iv);
 
+        mEditGv = (AddGridView) findViewById(R.id.add_edit_gv);
+
         mCameraBtn.setOnClickListener(this);
         mTakePhotoBtn.setOnClickListener(this);
         mRangeBtn.setOnClickListener(this);
@@ -92,7 +109,8 @@ public class AddActivity extends BaseActivity implements OnClickListener {
     public void onBackPressed() {
         // TODO Auto-generated method stub
         super.onBackPressed();
-        // overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+        // overridePendingTransition(R.anim.slide_in_left,
+        // R.anim.slide_out_right);
     }
 
     @Override
@@ -101,7 +119,6 @@ public class AddActivity extends BaseActivity implements OnClickListener {
         super.onDestroy();
         Log.e("lmf", "onDestroy>>>>>>>>>>>>>>>>>>>");
     }
-
 
     public static final int MEDIA_TYPE_IMAGE = 1;
 
@@ -160,29 +177,30 @@ public class AddActivity extends BaseActivity implements OnClickListener {
         return mediaFile;
     }
 
-
-
     @Override
     public void onClick(View arg0) {
         // TODO Auto-generated method stub
         switch (arg0.getId()) {
             case R.id.add_btm_camera_btn:
-                // create Intent to take a picture and return control to the calling application
+                // create Intent to take a picture and return control to the
+                // calling application
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
                 // create a file to save the image
                 fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
                 // set the image file name
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the image file name
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the
+                                                                   // image file
+                                                                   // name
 
                 // start the image capture Intent
-                startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+                startActivityForResult(intent, RC_CAPTURE_IMAGE_BY_CAMERA);
                 break;
             case R.id.add_btm_take_photo_btn:
                 Intent intentPhoto =
                         new Intent(Intent.ACTION_PICK,
                                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(intentPhoto, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+                startActivityForResult(intentPhoto, RC_CAPTURE_IMAGE_BY_CAMERA);
                 break;
             case R.id.add_btm_range_btn:
 
@@ -198,67 +216,85 @@ public class AddActivity extends BaseActivity implements OnClickListener {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(LOG_TAG, "onActivityResult: requestCode: " + requestCode + ", resultCode: "
                 + requestCode + ", data: " + data);
-        // 如果是拍照
-        if (CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE == requestCode) {
-            Log.d(LOG_TAG, "CAPTURE_IMAGE");
 
-            if (RESULT_OK == resultCode) {
-                Log.d(LOG_TAG, "RESULT_OK");
+        switch (requestCode) {
+            case RC_CAPTURE_IMAGE_BY_CAMERA:
+                if (RESULT_OK == resultCode) {
+                    Log.d(LOG_TAG, "RESULT_OK");
+                    String filePath;
+                    // Check if the result includes a thumbnail Bitmap
+                    if (data != null) {
+                        // 没有指定特定存储路径的时候
+                        Log.d(LOG_TAG, "data is NOT null, file on default position.");
 
-                // Check if the result includes a thumbnail Bitmap
-                if (data != null) {
-                    // 没有指定特定存储路径的时候
-                    Log.d(LOG_TAG, "data is NOT null, file on default position.");
+                        // 指定了存储路径的时候（intent.putExtra(MediaStore.EXTRA_OUTPUT,fileUri);）
+                        // Image captured and saved to fileUri specified in the
+                        // Intent
+                        Toast.makeText(this, "Image saved to:\n" + data.getData(),
+                                Toast.LENGTH_LONG)
+                                .show();
 
-                    // 指定了存储路径的时候（intent.putExtra(MediaStore.EXTRA_OUTPUT,fileUri);）
-                    // Image captured and saved to fileUri specified in the
-                    // Intent
-                    Toast.makeText(this, "Image saved to:\n" + data.getData(), Toast.LENGTH_LONG)
-                            .show();
+                        filePath = BaseUtil.selectImageByUri(mContext, data.getData());
 
-                    if (data.hasExtra("data")) {
-                        Bitmap thumbnail = data.getParcelableExtra("data");
-                        mEditImageIv.setImageBitmap(thumbnail);
+                    } else {
+                        filePath = fileUri.getPath();
+
                     }
+
+                    if (!TextUtils.isEmpty(filePath)) {
+                        Log.d(LOG_TAG, "data IS null, file saved on target position.");
+
+                        BitmapFactory.Options factoryOptions = new BitmapFactory.Options();
+
+                        factoryOptions.inJustDecodeBounds = true;
+                        BitmapFactory.decodeFile(fileUri.getPath(), factoryOptions);
+
+                        int imageWidth = factoryOptions.outWidth;
+                        int imageHeight = factoryOptions.outHeight;
+
+                        // Determine how much to scale down the image
+                        int scaleFactor = Math.min(imageWidth / 400, imageHeight / 400);
+
+                        // Decode the image file into a Bitmap sized to fill the
+                        // View
+                        factoryOptions.inJustDecodeBounds = false;
+                        factoryOptions.inSampleSize = scaleFactor;
+                        factoryOptions.inPurgeable = true;
+
+                        Bitmap bitmap = BitmapFactory.decodeFile(filePath, factoryOptions);
+
+                        ImageView iv = new ImageView(mContext);
+                        iv.setImageBitmap(bitmap);
+
+                        if (mAddAdapter == null) {
+                            mBitmapList = new ArrayList<Bitmap>();
+                            mBitmapList.add(bitmap);
+                            mAddAdapter = new AddAdapter(mContext);
+                            mAddAdapter.setList(mBitmapList);
+                            mEditGv.setAdapter(mAddAdapter);
+                        } else {
+                            mBitmapList.add(bitmap);
+                            mAddAdapter.notifyDataSetChanged();
+                        }
+
+                        mEditImageIv.setImageBitmap(bitmap);
+                    } else {
+                        Log.e("lmf", "error>>>>>>>>>>>>>>>>");
+                    }
+
+                } else if (resultCode == RESULT_CANCELED) {
+                    // User cancelled the image capture
+                    Log.e("lmf", ">>>>>>>>User cancelled the image capture>>>>>>>>>");
                 } else {
-
-                    Log.d(LOG_TAG, "data IS null, file saved on target position.");
-                    // If there is no thumbnail image data, the image
-                    // will have been stored in the target output URI.
-
-                    // Resize the full image to fit in out image view.
-                    int width = mEditImageIv.getWidth();
-                    int height = mEditImageIv.getHeight();
-
-                    BitmapFactory.Options factoryOptions = new BitmapFactory.Options();
-
-                    factoryOptions.inJustDecodeBounds = true;
-                    BitmapFactory.decodeFile(fileUri.getPath(), factoryOptions);
-
-                    int imageWidth = factoryOptions.outWidth;
-                    int imageHeight = factoryOptions.outHeight;
-
-                    // Determine how much to scale down the image
-                    int scaleFactor = Math.min(imageWidth / width, imageHeight / height);
-
-                    // Decode the image file into a Bitmap sized to fill the
-                    // View
-                    factoryOptions.inJustDecodeBounds = false;
-                    factoryOptions.inSampleSize = scaleFactor;
-                    factoryOptions.inPurgeable = true;
-
-                    Bitmap bitmap = BitmapFactory.decodeFile(fileUri.getPath(), factoryOptions);
-
-                    mEditImageIv.setImageBitmap(bitmap);
+                    // Image capture failed, advise user
+                    Log.e("lmf", ">>>>>>>>Image capture failed, advise user>>>>>>>>>");
                 }
-            } else if (resultCode == RESULT_CANCELED) {
-                // User cancelled the image capture
-            } else {
-                // Image capture failed, advise user
-            }
+                break;
+
+            default:
+                break;
         }
 
     }
-
 
 }

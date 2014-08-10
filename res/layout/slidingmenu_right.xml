@@ -9,13 +9,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dip"
-        android:text="right_btn1" />
+        android:text="历史生成页" />
 
     <Button
         android:id="@+id/right_btn2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dip"
-        android:text="right_btn2" />
+        android:text="礼品" />
+
+    <Button
+        android:id="@+id/right_btn3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dip"
+        android:text="分享案例" />
 
 </LinearLayout>

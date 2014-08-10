@@ -17,12 +17,37 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:background="#FF112211"
-        android:orientation="horizontal" >
+        android:orientation="vertical" >
 
-        <TextView
-            android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/settings_guide"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="设置页面" />
+            android:text="引导" />
+
+        <Button
+            android:id="@+id/settings_help"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="帮助" />
+
+        <Button
+            android:id="@+id/settings_notice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="新消息提醒" />
+
+        <Button
+            android:id="@+id/settings_check_new"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="检查更新" />
+
+        <Button
+            android:id="@+id/settings_delete_cache"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="清除缓存" />
 
         <Button
             android:id="@+id/settings_logout_btn"

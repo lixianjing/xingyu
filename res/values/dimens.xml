@@ -4,4 +4,7 @@
     <dimen name="shadow_width">15.0dip</dimen>
     
      <dimen name="listview_footer_height">44.0dip</dimen>
+     
+     
+     
 </resources>

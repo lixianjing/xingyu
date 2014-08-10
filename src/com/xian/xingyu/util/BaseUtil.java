@@ -1,9 +1,13 @@
+
 package com.xian.xingyu.util;
 
 import android.content.Context;
 import android.content.SharedPreferences.Editor;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
@@ -65,8 +69,6 @@ public class BaseUtil {
                 len = is.read(buffer);
             }
 
-
-
             fos.close();
             is.close();
 
@@ -76,7 +78,6 @@ public class BaseUtil {
             Log.v(TAG, "getbitmap bmp fail---");
         }
     }
-
 
     public static byte[] getImageData(Context context, String uri) {
         Log.v(TAG, "getImageData:" + uri);
@@ -122,7 +123,6 @@ public class BaseUtil {
         }
     }
 
-
     public static Bitmap bytes2Bimap(byte[] b) {
         if (b != null && b.length != 0) {
             return BitmapFactory.decodeByteArray(b, 0, b.length);
@@ -139,5 +139,35 @@ public class BaseUtil {
         editor.putInt(Configs.TYPE, Configs.TYPE_DEFAULT);
         editor.putInt(Configs.INFO_STATUS, Configs.INFO_STATUS_DEFAULT);
         editor.commit();
+    }
+
+    public static String selectImageByUri(Context context, Uri selectedImage) {
+
+        if (selectedImage == null) {
+            return null;
+        }
+        String[] filePathColumn = {
+                MediaStore.Images.Media.DATA
+        };
+        Cursor cursor = null;
+        try {
+            cursor = context.getContentResolver().query(selectedImage, filePathColumn, null,
+                    null, null);
+            if (cursor == null)
+                return null;
+            if (cursor.moveToFirst()) {
+                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                String picturePath = cursor.getString(columnIndex);
+                return picturePath;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return null;
     }
 }
