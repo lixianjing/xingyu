@@ -22,6 +22,11 @@ import android.widget.Toast;
 import com.xian.xingyu.R;
 import com.xian.xingyu.adapter.AddAdapter;
 import com.xian.xingyu.base.BaseActivity;
+import com.xian.xingyu.bean.EmotionInfo;
+import com.xian.xingyu.bean.FileDataInfo;
+import com.xian.xingyu.db.DBInfo.Emotion;
+import com.xian.xingyu.db.DBInfo.FileData;
+import com.xian.xingyu.db.DBManager;
 import com.xian.xingyu.util.BaseUtil;
 import com.xian.xingyu.view.AddGridView;
 import com.xian.xingyu.view.CommonHeadView;
@@ -36,8 +41,7 @@ public class AddActivity extends BaseActivity implements OnClickListener {
 
     private static final String LOG_TAG = "lmf";
 
-    private static final int RC_CAPTURE_IMAGE_BY_CAMERA = 101;
-    private static final int RC_CAPTURE_IMAGE_BY_PHOTO = 102;
+    private static final int RC_CAPTURE_IMAGE = 101;
     private Uri fileUri;
 
     private Context mContext;
@@ -50,7 +54,12 @@ public class AddActivity extends BaseActivity implements OnClickListener {
     private AddGridView mEditGv;
     private AddAdapter mAddAdapter;
 
+    private final int type = Emotion.TYPE_PRIVATE;
+
+    private List<FileDataInfo> mFileList;
     private List<Bitmap> mBitmapList;
+
+    private DBManager mDBManager;
 
     @Override
     protected void onCreate(Bundle arg0) {
@@ -58,6 +67,8 @@ public class AddActivity extends BaseActivity implements OnClickListener {
         super.onCreate(arg0);
         setContentView(R.layout.add_activity);
         mContext = this;
+
+        mDBManager = DBManager.getInstance(mContext);
 
         initTitle();
         initView();
@@ -81,7 +92,38 @@ public class AddActivity extends BaseActivity implements OnClickListener {
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
-                Log.e("lmf", ">>>>>>>>编辑>>>>>>>>");
+                Log.e("lmf", ">>>>>>>>保存>>>>>>>>");
+                EmotionInfo info = new EmotionInfo();
+                info.setContent(mEditText.getText().toString());
+                info.setStamp(System.currentTimeMillis());
+                info.setType(type);
+                info.setStatus(Emotion.STATUS_LOCAL);
+                if (mFileList != null && mFileList.size() > 0) {
+                    info.setHasPic(true);
+                } else {
+                    info.setHasPic(false);
+                }
+
+                Uri uri = mDBManager.insertEmotion(info);
+                Log.e("lmf", ">>>>>>>>uri>>>>>>>>>>" + uri);
+                if (uri != null) {
+                    String idStr = uri.getLastPathSegment();
+                    long id = -1;
+                    try {
+                        id = Long.valueOf(idStr);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    Log.e("lmf", ">>>>>>>>id>>>>>>>>>>" + id + ":" + mFileList.size());
+                    if (id != -1) {
+                        for (FileDataInfo data : mFileList) {
+                            data.setFileId(id);
+                            mDBManager.insertFileData(data);
+                        }
+                    }
+                }
+                Toast.makeText(mContext, "保存成功", 2000).show();
+                onBackPressed();
             }
         });
     }
@@ -194,13 +236,13 @@ public class AddActivity extends BaseActivity implements OnClickListener {
                                                                    // name
 
                 // start the image capture Intent
-                startActivityForResult(intent, RC_CAPTURE_IMAGE_BY_CAMERA);
+                startActivityForResult(intent, RC_CAPTURE_IMAGE);
                 break;
             case R.id.add_btm_take_photo_btn:
                 Intent intentPhoto =
                         new Intent(Intent.ACTION_PICK,
                                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(intentPhoto, RC_CAPTURE_IMAGE_BY_CAMERA);
+                startActivityForResult(intentPhoto, RC_CAPTURE_IMAGE);
                 break;
             case R.id.add_btm_range_btn:
 
@@ -218,7 +260,7 @@ public class AddActivity extends BaseActivity implements OnClickListener {
                 + requestCode + ", data: " + data);
 
         switch (requestCode) {
-            case RC_CAPTURE_IMAGE_BY_CAMERA:
+            case RC_CAPTURE_IMAGE:
                 if (RESULT_OK == resultCode) {
                     Log.d(LOG_TAG, "RESULT_OK");
                     String filePath;
@@ -247,7 +289,7 @@ public class AddActivity extends BaseActivity implements OnClickListener {
                         BitmapFactory.Options factoryOptions = new BitmapFactory.Options();
 
                         factoryOptions.inJustDecodeBounds = true;
-                        BitmapFactory.decodeFile(fileUri.getPath(), factoryOptions);
+                        BitmapFactory.decodeFile(filePath, factoryOptions);
 
                         int imageWidth = factoryOptions.outWidth;
                         int imageHeight = factoryOptions.outHeight;
@@ -263,19 +305,22 @@ public class AddActivity extends BaseActivity implements OnClickListener {
 
                         Bitmap bitmap = BitmapFactory.decodeFile(filePath, factoryOptions);
 
-                        ImageView iv = new ImageView(mContext);
-                        iv.setImageBitmap(bitmap);
-
                         if (mAddAdapter == null) {
+                            mFileList = new ArrayList<FileDataInfo>();
                             mBitmapList = new ArrayList<Bitmap>();
-                            mBitmapList.add(bitmap);
                             mAddAdapter = new AddAdapter(mContext);
                             mAddAdapter.setList(mBitmapList);
                             mEditGv.setAdapter(mAddAdapter);
-                        } else {
-                            mBitmapList.add(bitmap);
-                            mAddAdapter.notifyDataSetChanged();
                         }
+                        FileDataInfo info = new FileDataInfo();
+                        info.setFileType(FileData.FILE_TYPE_EMOTION);
+                        info.setUri(filePath);
+                        info.setType(FileData.TYPE_IMAGE);
+                        info.setStatus(FileData.STATUS_LOCAL);
+
+                        mFileList.add(info);
+                        mBitmapList.add(bitmap);
+                        mAddAdapter.notifyDataSetChanged();
 
                         mEditImageIv.setImageBitmap(bitmap);
                     } else {

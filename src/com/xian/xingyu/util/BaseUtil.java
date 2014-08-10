@@ -7,10 +7,16 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.xian.xingyu.db.XianDataBaseHelper;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -169,5 +175,55 @@ public class BaseUtil {
         }
 
         return null;
+    }
+
+    public static void copyToSDCard(Context context) {
+        File file = context.getDatabasePath(XianDataBaseHelper.DATABASE_NAME);
+        if (file != null) {
+            if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+                File sdCardDir = Environment.getExternalStorageDirectory();// 获取SDCard目录
+                File saveFile = new File(sdCardDir, file.getName());
+                if (saveFile.exists()) {
+                    saveFile.delete();
+                }
+
+                FileInputStream fisFrom = null;
+                FileOutputStream fosTo = null;
+                try {
+                    fisFrom = new FileInputStream(file);
+                    fosTo = new FileOutputStream(saveFile);
+                    byte bt[] = new byte[1024];
+                    int c;
+                    while ((c = fisFrom.read(bt)) > 0) {
+                        fosTo.write(bt, 0, c); // 将内容写到新文件当中
+                    }
+                    Toast.makeText(context, "拷贝数据完毕", Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    Toast.makeText(context, "拷贝数据出错", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                } finally {
+                    if (fisFrom != null) {
+                        try {
+                            fisFrom.close();
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
+                    if (fosTo != null) {
+                        try {
+                            fosTo.close();
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+
+        } else {
+            Toast.makeText(context, "没有数据库文件", Toast.LENGTH_SHORT).show();
+        }
     }
 }

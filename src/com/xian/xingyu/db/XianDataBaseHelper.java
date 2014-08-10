@@ -9,7 +9,7 @@ import android.util.Log;
 public class XianDataBaseHelper extends SQLiteOpenHelper {
 
     private static final String TAG = "XianDataBaseHelper";
-    private static final String DATABASE_NAME = "xian.db";
+    public static final String DATABASE_NAME = "xian.db";
     private static final int DATABASE_VERSION = 1;
 
     private final Context mContext;
@@ -86,6 +86,27 @@ public class XianDataBaseHelper extends SQLiteOpenHelper {
                 + DBInfo.Personal.BIRTH_YEAR + " INTEGER," + DBInfo.Personal.BIRTH_MONTH
                 + " INTEGER," + DBInfo.Personal.BIRTH_DAY + " INTEGER,"
                 + DBInfo.Personal.BIRTH_TYPE + " INTEGER DEFAULT 0);");
+
+        db.execSQL("CREATE TABLE " + DBInfo.Emotion.TABLE + " (" + DBInfo.Emotion._ID
+                + " INTEGER PRIMARY KEY," + DBInfo.Emotion.SUBJECT + " TEXT,"
+                + DBInfo.Emotion.CONTENT + " TEXT," + DBInfo.Emotion.STAMP + " INTEGER,"
+                + DBInfo.Emotion.LOCAL + " TEXT,"
+                + DBInfo.Emotion.LOCAL_GPS + " TEXT," + DBInfo.Emotion.TYPE + " INTEGER DEFAULT 0,"
+                + DBInfo.Emotion.STATUS + " INTEGER DEFAULT 0," + DBInfo.Emotion.HAS_PIC
+                + " INTEGER DEFAULT 0,"
+                + DBInfo.Emotion.COMMENT_COUNT + " INTEGER DEFAULT 0," + DBInfo.Emotion.FAV_COUNT
+                + " INTEGER DEFAULT 0," + DBInfo.Emotion.USER_TOKEN + " TEXT);");
+
+        db.execSQL("CREATE TABLE " + DBInfo.FileData.TABLE + " (" + DBInfo.FileData._ID
+                + " INTEGER PRIMARY KEY," + DBInfo.FileData.FILE_TYPE + " INTEGER,"
+                + DBInfo.FileData.FILE_ID + " INTEGER," + DBInfo.FileData.MIME + " TEXT,"
+                + DBInfo.FileData.URI + " TEXT,"
+                + DBInfo.FileData.THUMB_URI + " TEXT," + DBInfo.FileData.SIZE
+                + " INTEGER DEFAULT 0,"
+                + DBInfo.FileData.POS + " INTEGER DEFAULT 0," + DBInfo.FileData.TYPE
+                + " INTEGER DEFAULT 0,"
+                + DBInfo.FileData.STATUS + " INTEGER DEFAULT 0," + DBInfo.FileData.SEQ
+                + " TEXT );");
 
     }
 

@@ -1,8 +1,5 @@
 package com.xian.xingyu.activity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -47,6 +44,9 @@ import com.xian.xingyu.util.Configs;
 import com.xian.xingyu.view.DrawerView;
 import com.xian.xingyu.view.LoadingDialog;
 import com.xian.xingyu.view.LoginDialog;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends FragmentActivity implements OnClickListener {
 
@@ -393,6 +393,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
         switch (arg0.getId()) {
             case R.id.head_viewpage_left_tv:
                 mViewPager.setCurrentItem(0);
+                BaseUtil.copyToSDCard(mContext);
                 break;
             case R.id.head_viewpage_right_tv:
                 mViewPager.setCurrentItem(1);

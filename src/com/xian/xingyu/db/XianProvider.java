@@ -13,11 +13,13 @@ import android.net.Uri;
 
 public class XianProvider extends ContentProvider {
 
-    private final static String TAG = "EucProvider";
+    private final static String TAG = "XianProvider";
     private final static boolean DEBUG = false;
 
     private static final int ALL = 0;
     private static final int PERSONAL_FILTER = 1;
+    private static final int EMOTION_FILTER = 2;
+    private static final int FILEDATA_FILTER = 3;
 
     private static final UriMatcher sURLMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -25,6 +27,8 @@ public class XianProvider extends ContentProvider {
         sURLMatcher.addURI(DBInfo.AUTHORITY, null, ALL);
 
         sURLMatcher.addURI(DBInfo.AUTHORITY, DBInfo.Personal.TABLE, PERSONAL_FILTER);
+        sURLMatcher.addURI(DBInfo.AUTHORITY, DBInfo.Emotion.TABLE, EMOTION_FILTER);
+        sURLMatcher.addURI(DBInfo.AUTHORITY, DBInfo.FileData.TABLE, FILEDATA_FILTER);
 
     }
 
@@ -48,6 +52,12 @@ public class XianProvider extends ContentProvider {
             case PERSONAL_FILTER:
                 qb.setTables(DBInfo.Personal.TABLE);
                 break;
+            case EMOTION_FILTER:
+                qb.setTables(DBInfo.Emotion.TABLE);
+                break;
+            case FILEDATA_FILTER:
+                qb.setTables(DBInfo.FileData.TABLE);
+                break;
 
             default:
 
@@ -67,26 +77,31 @@ public class XianProvider extends ContentProvider {
     public Uri insert(Uri uri, ContentValues values) {
         String tableName = null;
 
-        // int match = sURLMatcher.match(uri);
-        // switch (match) {
-        // case ALL:
-        // return null;
-//            case PERSONAL_FILTER:
-//                tableName = DBInfo.Personal.TABLE;
-//                break;
-        //
-        // default:
-        // return null;
-        // }
-        //
-        // if (tableName != null) {
-        // SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-        // long id = db.insert(tableName, null, values);
-        // Uri res = Uri.withAppendedPath(uri, String.valueOf(id));
-        // if (res != null)
-        // notifyChange(res);
-        // return res;
-        // }
+        int match = sURLMatcher.match(uri);
+        switch (match) {
+            case ALL:
+                return null;
+            case PERSONAL_FILTER:
+                return null;
+            case EMOTION_FILTER:
+                tableName = DBInfo.Emotion.TABLE;
+                break;
+            case FILEDATA_FILTER:
+                tableName = DBInfo.FileData.TABLE;
+                break;
+
+            default:
+                return null;
+        }
+
+        if (tableName != null) {
+            SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+            long id = db.insert(tableName, null, values);
+            Uri res = Uri.withAppendedPath(uri, String.valueOf(id));
+            if (res != null)
+                notifyChange(res);
+            return res;
+        }
         return null;
     }
 
@@ -95,24 +110,29 @@ public class XianProvider extends ContentProvider {
 
         String tableName = null;
         int count = 0;
-        // int match = sURLMatcher.match(uri);
-        // switch (match) {
-        // case ALL:
-        // return 0;
-        // case PERSONAL_FILTER:
-        // tableName = DBInfo.Personal.TABLE;
-        // break;
-        //
-        // default:
-        // return 0;
-        // }
-        // SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-        // if (tableName != null) {
-        // count = db.delete(tableName, selection, selectionArgs);
-        // }
-        // if (count > 0) {
-        // notifyChange(uri);
-        // }
+        int match = sURLMatcher.match(uri);
+        switch (match) {
+            case ALL:
+                return 0;
+            case PERSONAL_FILTER:
+                return 0;
+            case EMOTION_FILTER:
+                tableName = DBInfo.Emotion.TABLE;
+                break;
+            case FILEDATA_FILTER:
+                tableName = DBInfo.FileData.TABLE;
+                break;
+
+            default:
+                return 0;
+        }
+        SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        if (tableName != null) {
+            count = db.delete(tableName, selection, selectionArgs);
+        }
+        if (count > 0) {
+            notifyChange(uri);
+        }
         return count;
     }
 
@@ -127,6 +147,12 @@ public class XianProvider extends ContentProvider {
                 return 0;
             case PERSONAL_FILTER:
                 tableName = DBInfo.Personal.TABLE;
+                break;
+            case EMOTION_FILTER:
+                tableName = DBInfo.Emotion.TABLE;
+                break;
+            case FILEDATA_FILTER:
+                tableName = DBInfo.FileData.TABLE;
                 break;
 
             default:
