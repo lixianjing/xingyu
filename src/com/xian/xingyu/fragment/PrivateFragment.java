@@ -1,12 +1,11 @@
-
 package com.xian.xingyu.fragment;
+
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
@@ -25,20 +24,19 @@ import com.xian.xingyu.R;
 import com.xian.xingyu.activity.AddActivity;
 import com.xian.xingyu.activity.MainActivity;
 import com.xian.xingyu.adapter.PrivateAdapter;
-import com.xian.xingyu.adapter.PublicAdapter;
 import com.xian.xingyu.bean.EmotionInfo;
 import com.xian.xingyu.db.DBManager;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class PrivateFragment extends Fragment
         implements
-        OnClickListener,
-        SwipeRefreshLayout.OnRefreshListener {
+            OnClickListener,
+            SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = "PrivateFragment";
 
+
+    public static final int TYPE_LOAD_FORWARD = 0;
+    public static final int TYPE_LOAD_BACKWARD = 1;
 
     // 分页 显示
     public static final int LOAD_ITEM_COUNT = 20;
@@ -54,29 +52,9 @@ public class PrivateFragment extends Fragment
     private RelativeLayout mListBtmRl;
     private LinearLayout mListBtmProgressLayout;
 
-    private List<EmotionInfo> mEmotionList;
-
     private PrivateAdapter mPrivateAdapter;
     private DBManager mDBManager;
 
-    private final Handler mHandler = new Handler() {
-
-        @Override
-        public void handleMessage(Message msg) {
-            // TODO Auto-generated method stub
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case MSG_LOAD_FORWARD:
-                    mEmotionList = (List<EmotionInfo>) msg.obj;
-
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
-    };
 
     public PrivateFragment() {
         setRetainInstance(true);
@@ -97,7 +75,6 @@ public class PrivateFragment extends Fragment
                 android.R.color.holo_green_light, android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
-        initTestData();
 
         mListView = (ListView) view.findViewById(R.id.pri_lv);
 
@@ -115,37 +92,26 @@ public class PrivateFragment extends Fragment
             @Override
             public void onClick(View arg0) {
                 // TODO Auto-generated method stub
-                if (mListBtmProgressLayout.getVisibility() == View.VISIBLE)
-                    return;
+                if (mListBtmProgressLayout.getVisibility() == View.VISIBLE) return;
                 mListBtmTv.setVisibility(View.GONE);
                 mListBtmProgressLayout.setVisibility(View.VISIBLE);
-                new LoadDataAsyncTask(TYPE_LOAD_BACKWARD).execute(mDataList.get(mDataList.size() - 1));
+                startLoadData(TYPE_LOAD_BACKWARD);
 
             }
         });
         mListView.addFooterView(mListBtmRl);
 
-        mPublicAdapter = new PublicAdapter(getActivity());
-        mPublicAdapter.setList(mDataList);
-        mListView.setAdapter(mPublicAdapter);
-
         mTextView.setOnClickListener(this);
 
         if (MainApp.isLogin()) {
-            showData();
+            startLoadData(TYPE_LOAD_FORWARD);
         } else {
-            notLogin();
+            showText("你还没有登录哦");
         }
 
         return view;
     }
 
-    private void initTestData() {
-        mDataList = new ArrayList<Integer>();
-        for (int i = 100; i < 110; i++) {
-            mDataList.add(i);
-        }
-    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -226,31 +192,25 @@ public class PrivateFragment extends Fragment
     public void onRefresh() {
         // TODO Auto-generated method stub
 
-        new LoadDataAsyncTask(TYPE_LOAD_FORWARD).execute(mDataList.get(0));
+        startLoadData(TYPE_LOAD_FORWARD);
+
 
     }
 
-    public void notLogin() {
-        mTextView.setText("你还没有登陆哦");
+    public void showText(String text) {
+        mTextView.setText(text);
         mTextView.setVisibility(View.VISIBLE);
         mSwipeLayout.setVisibility(View.GONE);
     }
 
-    public void showData() {
-        mTextView.setText("你还没有秘密哦，赶紧加入吧");
 
-        mTextView.setVisibility(View.VISIBLE);
-        mSwipeLayout.setVisibility(View.GONE);
-
-        // mSwipeLayout.setVisibility(View.VISIBLE);
-        // mTextView.setVisibility(View.GONE);
-
+    public void startLoadData(int type) {
+        new LoadDataAsyncTask(type).execute();
     }
 
     private class LoadDataAsyncTask extends AsyncTask<Void, Void, List<EmotionInfo>> {
 
-        public static final int TYPE_LOAD_FORWARD = 0;
-        public static final int TYPE_LOAD_BACKWARD = 1;
+
 
         private final int type;
 
@@ -259,24 +219,41 @@ public class PrivateFragment extends Fragment
         }
 
 
+
+        @Override
+        protected void onPreExecute() {
+            // TODO Auto-generated method stub
+            super.onPreExecute();
+            if (loadCount == 0) {
+                showText("正在加载数据");
+            }
+        }
+
+
         @Override
         protected void onPostExecute(List<EmotionInfo> result) {
             // TODO Auto-generated method stub
             super.onPostExecute(result);
-
-            if (mPrivateAdapter == null) {
-                mEmotionList = new ArrayList<EmotionInfo>();
-                mEmotionList.addAll(result);
-                mPrivateAdapter = new PrivateAdapter(mActivity);
-                mPrivateAdapter.setList(mEmotionList);
-                mListView.setAdapter(mPrivateAdapter);
+            Log.e("lmf", ">>>>>>>>>onPostExecute>>>>>>>>>>>>>" + result.size());
+            if (result.size() == 0) {
+                loadCount = 0;
+                showText("你還沒有數據，抓緊添加吧");
+                return;
+            } else {
+                mTextView.setVisibility(View.GONE);
+                mSwipeLayout.setVisibility(View.VISIBLE);
             }
 
+            if (mPrivateAdapter == null) {
+                mPrivateAdapter = new PrivateAdapter(mActivity);
+                mPrivateAdapter.setList(result);
+                mListView.setAdapter(mPrivateAdapter);
+            } else {
+                mPrivateAdapter.setList(result);
+            }
             if (type == TYPE_LOAD_FORWARD) {
-                mEmotionList.addAll(0, result);
                 mSwipeLayout.setRefreshing(false);
             } else {
-                mEmotionList.addAll(mEmotionList.size(), result);
                 mListBtmTv.setVisibility(View.VISIBLE);
                 mListBtmProgressLayout.setVisibility(View.GONE);
             }
@@ -288,11 +265,12 @@ public class PrivateFragment extends Fragment
         @Override
         protected List<EmotionInfo> doInBackground(Void... params) {
             // TODO Auto-generated method stub
+
             loadCount = loadCount + LOAD_ITEM_COUNT;
 
-            List<EmotionInfo> list=mDBManager.qu
+            List<EmotionInfo> list = mDBManager.queryEmotion(loadCount);
 
-            return null;
+            return list;
         }
 
     }

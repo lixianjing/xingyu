@@ -1,5 +1,8 @@
 package com.xian.xingyu.activity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -44,9 +47,6 @@ import com.xian.xingyu.util.Configs;
 import com.xian.xingyu.view.DrawerView;
 import com.xian.xingyu.view.LoadingDialog;
 import com.xian.xingyu.view.LoginDialog;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends FragmentActivity implements OnClickListener {
 
@@ -133,7 +133,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                 case MSG_LOGIN_SUCCESS:
                     showDialogLoading(true);
                     MainApp.sAccountManager.getPersonalInfo();
-                    mPrivateFragment.showData();
+                    mPrivateFragment.startLoadData(PrivateFragment.TYPE_LOAD_FORWARD);
                     break;
 
                 case MSG_LOGIN_GET_INFO_CANCEL:
@@ -357,6 +357,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
 
     }
 
+
+
     private void initSlidingMenu() {
         drawerView = new DrawerView(this, mHandler);
         drawerView.initSlidingMenu();
@@ -397,6 +399,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                 break;
             case R.id.head_viewpage_right_tv:
                 mViewPager.setCurrentItem(1);
+                mPrivateFragment.startLoadData(PrivateFragment.TYPE_LOAD_FORWARD);
                 break;
 
             case R.id.tab_left_rl:

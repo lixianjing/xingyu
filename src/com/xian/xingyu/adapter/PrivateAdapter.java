@@ -1,7 +1,11 @@
-
 package com.xian.xingyu.adapter;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +17,6 @@ import android.widget.TextView;
 import com.xian.xingyu.R;
 import com.xian.xingyu.bean.EmotionInfo;
 import com.xian.xingyu.db.DBInfo.Emotion;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 
 public class PrivateAdapter extends BaseAdapter {
 
@@ -63,16 +63,15 @@ public class PrivateAdapter extends BaseAdapter {
         ViewHolder holder;
         if (convertView == null) {
 
-            convertView = mInflater.inflate(R.layout.item_private,
-                    null, false);
+            convertView = mInflater.inflate(R.layout.item_private, null, false);
             holder = new ViewHolder();
 
-            holder.dateTv = (TextView) convertView.findViewById(R.id.item_public_tv);
-            holder.timeTv = (TextView) convertView.findViewById(R.id.item_public_tv);
-            holder.contentTv = (TextView) convertView.findViewById(R.id.item_public_tv);
-            holder.typeTv = (TextView) convertView.findViewById(R.id.item_public_tv);
-            holder.imageHsv = (HorizontalScrollView) convertView
-                    .findViewById(R.id.item_private_image_hsv);
+            holder.dateTv = (TextView) convertView.findViewById(R.id.item_private_date_tv);
+            holder.timeTv = (TextView) convertView.findViewById(R.id.item_private_time_tv);
+            holder.contentTv = (TextView) convertView.findViewById(R.id.item_private_content_tv);
+            holder.typeTv = (TextView) convertView.findViewById(R.id.item_private_type_tv);
+            holder.imageHsv =
+                    (HorizontalScrollView) convertView.findViewById(R.id.item_private_image_hsv);
             holder.imageLl = (LinearLayout) convertView.findViewById(R.id.item_private_image_ll);
 
             convertView.setTag(holder);
@@ -86,7 +85,7 @@ public class PrivateAdapter extends BaseAdapter {
         Date d1 = new Date(info.getStamp());
         String t1 = sFormat.format(d1);
         String[] dateStr = t1.split(" ");
-
+        Log.e("lmf", ">>>>>>>>>>>dateStr>>>>>>>>>>>>>>>>" + dateStr + ":" + t1);
         holder.dateTv.setText(dateStr[0]);
         holder.timeTv.setText(dateStr[1]);
         holder.contentTv.setText(info.getContent());
@@ -100,8 +99,7 @@ public class PrivateAdapter extends BaseAdapter {
         return convertView;
     }
 
-    private class ViewHolder
-    {
+    private class ViewHolder {
         TextView dateTv, timeTv, contentTv, typeTv;
         LinearLayout imageLl;
         HorizontalScrollView imageHsv;

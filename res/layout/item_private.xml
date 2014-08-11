@@ -37,7 +37,7 @@
     </HorizontalScrollView>
 
     <TextView
-        android:id="@+id/item_private_status_tv"
+        android:id="@+id/item_private_type_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="私密" />

@@ -1,5 +1,7 @@
-
 package com.xian.xingyu.db;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -12,9 +14,6 @@ import com.xian.xingyu.bean.FileDataInfo;
 import com.xian.xingyu.bean.PersonInfo;
 import com.xian.xingyu.db.DBInfo.Emotion;
 import com.xian.xingyu.db.DBInfo.FileData;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class DBManager {
 
@@ -97,8 +96,7 @@ public class DBManager {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (cursor != null)
-                cursor.close();
+            if (cursor != null) cursor.close();
         }
 
         return null;
@@ -167,37 +165,31 @@ public class DBManager {
         try {
             List<EmotionInfo> list = new ArrayList<EmotionInfo>();
             cursor =
-                    mCr.query(Emotion.CONTENT_URI, Emotion.COLUMNS, null,
-                            null, Emotion.STAMP + " DESC ");
+                    mCr.query(Emotion.CONTENT_URI, Emotion.COLUMNS, null, null, Emotion.STAMP
+                            + " DESC ");
             while (cursor.moveToNext()) {
                 EmotionInfo info = new EmotionInfo();
 
                 info.setId(cursor.getLong(Emotion.INDEX_ID));
-                info.setSubject(cursor.getLong(Emotion.INDEX_SUBJECT));
-                info.setContent(cursor.getLong(Emotion.INDEX_CONTENT));
+                info.setSubject(cursor.getString(Emotion.INDEX_SUBJECT));
+                info.setContent(cursor.getString(Emotion.INDEX_CONTENT));
                 info.setStamp(cursor.getLong(Emotion.INDEX_STAMP));
-                info.setId(cursor.getLong(Emotion.INDEX_LOCAL));
-                info.setId(cursor.getLong(Emotion.INDEX_LOCAL_GPS));
-                info.setId(cursor.getLong(Emotion.INDEX_TYPE));
-                info.setId(cursor.getLong(Emotion.INDEX_STATUS));
-                info.setId(cursor.getLong(Emotion.INDEX_HAS_PIC));
-                info.setId(cursor.getLong(Emotion.INDEX_COMMENT_COUNT));
-                info.setId(cursor.getLong(Emotion.INDEX_FAV_COUNT));
-                info.setId(cursor.getLong(Emotion.INDEX_USER_TOKEN));
+                info.setLocal(cursor.getString(Emotion.INDEX_LOCAL));
+                info.setLocalGps(cursor.getString(Emotion.INDEX_LOCAL_GPS));
+                info.setType(cursor.getInt(Emotion.INDEX_TYPE));
+                info.setStatus(cursor.getInt(Emotion.INDEX_STATUS));
+                info.setHasPic(cursor.getInt(Emotion.INDEX_HAS_PIC) == Emotion.HAS_PIC_IS);
+                info.setCommentCount(cursor.getInt(Emotion.INDEX_COMMENT_COUNT));
+                info.setFavCount(cursor.getInt(Emotion.INDEX_FAV_COUNT));
+                info.setUserToken(cursor.getString(Emotion.INDEX_USER_TOKEN));
 
-                private long id;
-                private String subject;
-                private String content;
-                private long stamp;
-                private String local;
-                private String localGps;
-                private int type;
-                private int status;
-                private boolean hasPic;
-                private int commentCount;
-                private int favCount;
-                private String userToken;
-                private List<FileDataInfo> fileDateList;
+
+                if (info.isHasPic()) {
+                    List<FileDataInfo> fileDateList =
+                            queryFileData(info.getId(), FileData.FILE_TYPE_EMOTION);
+                    info.setFileDateList(fileDateList);
+                }
+
 
                 list.add(info);
             }
@@ -206,12 +198,12 @@ public class DBManager {
             e.printStackTrace();
             return null;
         } finally {
-            if (cursor != null)
-                cursor.close();
+            if (cursor != null) cursor.close();
         }
 
 
     }
+
     //
     // public EmotionInfo getEmotion(long id) {
     // ContentValues values = new ContentValues();
@@ -247,6 +239,43 @@ public class DBManager {
         values.put(FileData.SEQ, info.getSeq());
 
         return mCr.insert(FileData.CONTENT_URI, values);
+    }
+
+    public List<FileDataInfo> queryFileData(long id, int type) {
+
+        Cursor cursor = null;
+        try {
+            List<FileDataInfo> list = new ArrayList<FileDataInfo>();
+            cursor =
+                    mCr.query(FileData.CONTENT_URI, FileData.COLUMNS, FileData.FILE_ID + " = " + id
+                            + " AND " + FileData.FILE_TYPE + " = " + type, null, FileData._ID
+                            + " ASC ");
+            while (cursor.moveToNext()) {
+                FileDataInfo info = new FileDataInfo();
+
+                info.setId(cursor.getLong(FileData.INDEX_ID));
+                info.setFileType(cursor.getInt(FileData.INDEX_FILE_TYPE));
+                info.setFileId(cursor.getInt(FileData.INDEX_FILE_ID));
+                info.setMime(cursor.getString(FileData.INDEX_MIME));
+                info.setUri(cursor.getString(FileData.INDEX_URI));
+                info.setThumbUri(cursor.getString(FileData.INDEX_THUMB_URI));
+                info.setSize(cursor.getLong(FileData.INDEX_SIZE));
+                info.setPos(cursor.getLong(FileData.INDEX_STATUS));
+                info.setType(cursor.getInt(FileData.INDEX_TYPE));
+                info.setStatus(cursor.getInt(FileData.INDEX_STATUS));
+                info.setSeq(cursor.getString(FileData.INDEX_SEQ));
+
+                list.add(info);
+            }
+            return list;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (cursor != null) cursor.close();
+        }
+
+
     }
 
 }
