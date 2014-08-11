@@ -1,5 +1,10 @@
-
 package com.xian.xingyu.activity;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import android.content.Context;
 import android.content.Intent;
@@ -30,12 +35,6 @@ import com.xian.xingyu.db.DBManager;
 import com.xian.xingyu.util.BaseUtil;
 import com.xian.xingyu.view.AddGridView;
 import com.xian.xingyu.view.CommonHeadView;
-
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 public class AddActivity extends BaseActivity implements OnClickListener {
 
@@ -91,6 +90,13 @@ public class AddActivity extends BaseActivity implements OnClickListener {
 
             @Override
             public void onClick(View v) {
+
+                if (mEditText.getText().length() == 0
+                        && (mFileList == null || mFileList.size() == 0)) {
+                    Log.e("lmf", ">>>>>>>>请输入必要的信息>>>>>>>>");
+                    return;
+                }
+
                 // TODO Auto-generated method stub
                 Log.e("lmf", ">>>>>>>>保存>>>>>>>>");
                 EmotionInfo info = new EmotionInfo();
@@ -106,7 +112,7 @@ public class AddActivity extends BaseActivity implements OnClickListener {
 
                 Uri uri = mDBManager.insertEmotion(info);
                 Log.e("lmf", ">>>>>>>>uri>>>>>>>>>>" + uri);
-                if (uri != null) {
+                if (info.isHasPic() && uri != null) {
                     String idStr = uri.getLastPathSegment();
                     long id = -1;
                     try {
@@ -273,8 +279,7 @@ public class AddActivity extends BaseActivity implements OnClickListener {
                         // Image captured and saved to fileUri specified in the
                         // Intent
                         Toast.makeText(this, "Image saved to:\n" + data.getData(),
-                                Toast.LENGTH_LONG)
-                                .show();
+                                Toast.LENGTH_LONG).show();
 
                         filePath = BaseUtil.selectImageByUri(mContext, data.getData());
 
