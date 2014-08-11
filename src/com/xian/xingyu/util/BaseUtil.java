@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.xian.xingyu.db.XianDataBaseHelper;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,6 +28,9 @@ import java.net.URL;
 public class BaseUtil {
 
     private static final String TAG = "BaseUtil";
+
+    public static final int FILE_TYPE_NATIVE = 0;
+    public static final int FILE_TYPE_THUMB = 1;
 
     /**
      * 根据一个网络连接(String)获取bitmap图像
@@ -226,4 +230,97 @@ public class BaseUtil {
             Toast.makeText(context, "没有数据库文件", Toast.LENGTH_SHORT).show();
         }
     }
+
+    public static File getFilePath(Context context, int type) {
+        File dir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        if (dir == null) {
+            dir = context.getFilesDir();
+        }
+        File file = new File(dir, type + "-" + System.currentTimeMillis() + "-"
+                + Math.round(Math.random() * 10));
+        return file;
+    }
+
+    public static Uri fromFile(File file) {
+        if (file == null) {
+            throw new NullPointerException("file");
+        }
+
+        return Uri.fromFile(file);
+    }
+
+    // Bitmap对象保存味图片文件
+    public static File saveBitmapFile(Context context, Bitmap bitmap) {
+        BufferedOutputStream bos = null;
+        File file = getFilePath(context, FILE_TYPE_THUMB);
+        try {
+            bos = new BufferedOutputStream(new FileOutputStream(file));
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+            bos.flush();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (bos != null) {
+                try {
+                    bos.close();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
+        return file;
+    }
+
+    public static void copyFile(File oldFile, File newFile) {
+
+        if (oldFile == null || !oldFile.exists())
+            return;
+        if (newFile == null)
+            return;
+
+        int length = 0;
+        FileInputStream fis = null;
+        FileOutputStream fos = null;
+        try {
+            fis = new FileInputStream(oldFile);
+            fos = new FileOutputStream(newFile);
+            byte[] buffer = new byte[1024];
+            while ((length = fis.read(buffer)) != -1) {
+                fos.write(buffer, 0, length);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    }
+
+    public static Bitmap getBitmapFromPath(String path) {
+
+        BitmapFactory.Options factoryOptions = new BitmapFactory.Options();
+
+        factoryOptions.inJustDecodeBounds = false;
+        factoryOptions.inPurgeable = true;
+
+        return BitmapFactory.decodeFile(path, factoryOptions);
+    }
+
 }

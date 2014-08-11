@@ -1,11 +1,7 @@
+
 package com.xian.xingyu.adapter;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +13,10 @@ import android.widget.TextView;
 import com.xian.xingyu.R;
 import com.xian.xingyu.bean.EmotionInfo;
 import com.xian.xingyu.db.DBInfo.Emotion;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 
 public class PrivateAdapter extends BaseAdapter {
 
@@ -85,7 +85,6 @@ public class PrivateAdapter extends BaseAdapter {
         Date d1 = new Date(info.getStamp());
         String t1 = sFormat.format(d1);
         String[] dateStr = t1.split(" ");
-        Log.e("lmf", ">>>>>>>>>>>dateStr>>>>>>>>>>>>>>>>" + dateStr + ":" + t1);
         holder.dateTv.setText(dateStr[0]);
         holder.timeTv.setText(dateStr[1]);
         holder.contentTv.setText(info.getContent());
@@ -95,6 +94,27 @@ public class PrivateAdapter extends BaseAdapter {
         } else {
             holder.typeTv.setText("公开");
         }
+        holder.imageHsv.setVisibility(View.GONE);
+        // if (info.isHasPic()) {
+        // List<FileDataInfo> list = info.getFileDateList();
+        // if (list != null && list.size() > 0) {
+        // holder.imageHsv.setVisibility(View.VISIBLE);
+        // holder.imageLl.removeAllViews();
+        // for (int i = 0; i < list.size(); i++) {
+        // FileDataInfo dataInfo = list.get(i);
+        //
+        // ImageView iv = new ImageView(mContext);
+        // LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100,
+        // 100);
+        //
+        // Bitmap bitmap = BaseUtil.getBitmapFromPath(dataInfo.getThumbUri());
+        // iv.setImageBitmap(bitmap);
+        //
+        // holder.imageLl.addView(iv, i, params);
+        //
+        // }
+        // }
+        // }
 
         return convertView;
     }

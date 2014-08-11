@@ -1,6 +1,5 @@
-package com.xian.xingyu.fragment;
 
-import java.util.List;
+package com.xian.xingyu.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -14,6 +13,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -22,18 +23,20 @@ import android.widget.TextView;
 import com.xian.xingyu.MainApp;
 import com.xian.xingyu.R;
 import com.xian.xingyu.activity.AddActivity;
+import com.xian.xingyu.activity.EmotionActivity;
 import com.xian.xingyu.activity.MainActivity;
 import com.xian.xingyu.adapter.PrivateAdapter;
 import com.xian.xingyu.bean.EmotionInfo;
 import com.xian.xingyu.db.DBManager;
 
+import java.util.List;
+
 public class PrivateFragment extends Fragment
         implements
-            OnClickListener,
-            SwipeRefreshLayout.OnRefreshListener {
+        OnClickListener,
+        SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = "PrivateFragment";
-
 
     public static final int TYPE_LOAD_FORWARD = 0;
     public static final int TYPE_LOAD_BACKWARD = 1;
@@ -55,7 +58,6 @@ public class PrivateFragment extends Fragment
     private PrivateAdapter mPrivateAdapter;
     private DBManager mDBManager;
 
-
     public PrivateFragment() {
         setRetainInstance(true);
     }
@@ -75,7 +77,6 @@ public class PrivateFragment extends Fragment
                 android.R.color.holo_green_light, android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
-
         mListView = (ListView) view.findViewById(R.id.pri_lv);
 
         mListBtmRl =
@@ -92,7 +93,8 @@ public class PrivateFragment extends Fragment
             @Override
             public void onClick(View arg0) {
                 // TODO Auto-generated method stub
-                if (mListBtmProgressLayout.getVisibility() == View.VISIBLE) return;
+                if (mListBtmProgressLayout.getVisibility() == View.VISIBLE)
+                    return;
                 mListBtmTv.setVisibility(View.GONE);
                 mListBtmProgressLayout.setVisibility(View.VISIBLE);
                 startLoadData(TYPE_LOAD_BACKWARD);
@@ -101,17 +103,28 @@ public class PrivateFragment extends Fragment
         });
         mListView.addFooterView(mListBtmRl);
 
-        mTextView.setOnClickListener(this);
 
-        if (MainApp.isLogin()) {
-            startLoadData(TYPE_LOAD_FORWARD);
-        } else {
-            showText("你还没有登录哦");
-        }
+
+        initListener();
 
         return view;
     }
 
+    private void initListener() {
+        mTextView.setOnClickListener(this);
+
+        mListView.setOnItemClickListener(new OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // TODO Auto-generated method stub
+                Log.e("lmf", ">>>>>>>>>>onItemClick>>>>>>>>>");
+                mActivity.startActivity(new Intent(mActivity, EmotionActivity.class));
+                mActivity.overridePendingTransition(R.anim.slide_in_right,
+                        R.anim.slide_out_left);
+            }
+        });
+    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -163,6 +176,12 @@ public class PrivateFragment extends Fragment
         // TODO Auto-generated method stub
         super.onStart();
         Log.e(TAG, ">>>onStart>>>>>>>>>>>>>");
+
+        if (MainApp.isLogin()) {
+            startLoadData(TYPE_LOAD_FORWARD);
+        } else {
+            showText("你还没有登录哦");
+        }
     }
 
     @Override
@@ -194,7 +213,6 @@ public class PrivateFragment extends Fragment
 
         startLoadData(TYPE_LOAD_FORWARD);
 
-
     }
 
     public void showText(String text) {
@@ -203,22 +221,17 @@ public class PrivateFragment extends Fragment
         mSwipeLayout.setVisibility(View.GONE);
     }
 
-
     public void startLoadData(int type) {
         new LoadDataAsyncTask(type).execute();
     }
 
     private class LoadDataAsyncTask extends AsyncTask<Void, Void, List<EmotionInfo>> {
 
-
-
         private final int type;
 
         public LoadDataAsyncTask(int type) {
             this.type = type;
         }
-
-
 
         @Override
         protected void onPreExecute() {
@@ -229,13 +242,11 @@ public class PrivateFragment extends Fragment
             }
         }
 
-
         @Override
         protected void onPostExecute(List<EmotionInfo> result) {
             // TODO Auto-generated method stub
             super.onPostExecute(result);
-            Log.e("lmf", ">>>>>>>>>onPostExecute>>>>>>>>>>>>>" + result.size());
-            if (result.size() == 0) {
+            if (result == null || result.size() == 0) {
                 loadCount = 0;
                 showText("你還沒有數據，抓緊添加吧");
                 return;

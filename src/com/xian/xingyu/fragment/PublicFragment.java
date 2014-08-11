@@ -1,6 +1,7 @@
 package com.xian.xingyu.fragment;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,12 +12,15 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.xian.xingyu.R;
+import com.xian.xingyu.activity.EmotionActivity;
 import com.xian.xingyu.activity.MainActivity;
 import com.xian.xingyu.adapter.PublicAdapter;
 
@@ -105,11 +109,25 @@ public class PublicFragment extends Fragment
         mPublicAdapter = new PublicAdapter(getActivity());
         mPublicAdapter.setList(mDataList);
         mListView.setAdapter(mPublicAdapter);
-
+        initListener();
 
         return view;
     }
 
+    private void initListener() {
+        
+        mListView.setOnItemClickListener(new OnItemClickListener() {
+            
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // TODO Auto-generated method stub
+                Log.e("lmf", ">>>>>>>>>>onItemClick>>>>>>>>>");
+                mActivity.startActivity(new Intent(mActivity, EmotionActivity.class));
+                mActivity.overridePendingTransition(R.anim.slide_in_right,
+                        R.anim.slide_out_left);
+            }
+        });
+    }
     private void initTestData() {
         mDataList = new ArrayList<Integer>();
         for (int i = 100; i < 110; i++) {

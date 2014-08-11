@@ -1,10 +1,5 @@
-package com.xian.xingyu.activity;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+package com.xian.xingyu.activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
@@ -35,6 +29,10 @@ import com.xian.xingyu.db.DBManager;
 import com.xian.xingyu.util.BaseUtil;
 import com.xian.xingyu.view.AddGridView;
 import com.xian.xingyu.view.CommonHeadView;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AddActivity extends BaseActivity implements OnClickListener {
 
@@ -168,63 +166,6 @@ public class AddActivity extends BaseActivity implements OnClickListener {
         Log.e("lmf", "onDestroy>>>>>>>>>>>>>>>>>>>");
     }
 
-    public static final int MEDIA_TYPE_IMAGE = 1;
-
-    /** Create a file Uri for saving an image or video */
-    private static Uri getOutputMediaFileUri(int type) {
-        return Uri.fromFile(getOutputMediaFile(type));
-    }
-
-    /** Create a File for saving an image or video */
-    private static File getOutputMediaFile(int type) {
-        // To be safe, you should check that the SDCard is mounted
-        // using Environment.getExternalStorageState() before doing this.
-
-        File mediaStorageDir = null;
-        try {
-            // This location works best if you want the created images to be
-            // shared
-            // between applications and persist after your app has been
-            // uninstalled.
-            mediaStorageDir =
-                    new File(
-                            Environment
-                                    .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                            "MyCameraApp");
-
-            Log.d(LOG_TAG, "Successfully created mediaStorageDir: " + mediaStorageDir);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.d(LOG_TAG, "Error in Creating mediaStorageDir: " + mediaStorageDir);
-        }
-
-        // Create the storage directory if it does not exist
-        if (!mediaStorageDir.exists()) {
-            if (!mediaStorageDir.mkdirs()) {
-                // 在SD卡上创建文件夹需要权限：
-                // <uses-permission
-                // android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-                Log.d(LOG_TAG,
-                        "failed to create directory, check if you have the WRITE_EXTERNAL_STORAGE permission");
-                return null;
-            }
-        }
-
-        // Create a media file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File mediaFile;
-        if (type == MEDIA_TYPE_IMAGE) {
-            mediaFile =
-                    new File(mediaStorageDir.getPath() + File.separator + "IMG_" + timeStamp
-                            + ".jpg");
-        } else {
-            return null;
-        }
-
-        return mediaFile;
-    }
-
     @Override
     public void onClick(View arg0) {
         // TODO Auto-generated method stub
@@ -235,7 +176,8 @@ public class AddActivity extends BaseActivity implements OnClickListener {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
                 // create a file to save the image
-                fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
+                fileUri = BaseUtil.fromFile(BaseUtil.getFilePath(mContext,
+                        BaseUtil.FILE_TYPE_NATIVE));
                 // set the image file name
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the
                                                                    // image file
@@ -259,6 +201,8 @@ public class AddActivity extends BaseActivity implements OnClickListener {
         }
     }
 
+    private static final int IMAGE_SCALE = 100;
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -280,14 +224,20 @@ public class AddActivity extends BaseActivity implements OnClickListener {
                         // Intent
                         Toast.makeText(this, "Image saved to:\n" + data.getData(),
                                 Toast.LENGTH_LONG).show();
-
                         filePath = BaseUtil.selectImageByUri(mContext, data.getData());
+                        if (!TextUtils.isEmpty(filePath)) {
+                            File oldFile = new File(filePath);
+                            File newFile = BaseUtil
+                                    .getFilePath(mContext, BaseUtil.FILE_TYPE_NATIVE);
+                            BaseUtil.copyFile(oldFile, newFile);
+                            filePath = newFile.getAbsolutePath();
+                        }
 
                     } else {
                         filePath = fileUri.getPath();
 
                     }
-
+                    Log.e("lmf", ">>>>>>>>>>filePath>>>>>>>>>>" + filePath);
                     if (!TextUtils.isEmpty(filePath)) {
                         Log.d(LOG_TAG, "data IS null, file saved on target position.");
 
@@ -300,8 +250,19 @@ public class AddActivity extends BaseActivity implements OnClickListener {
                         int imageHeight = factoryOptions.outHeight;
 
                         // Determine how much to scale down the image
-                        int scaleFactor = Math.min(imageWidth / 400, imageHeight / 400);
-
+                        int scaleFactor = Math.min(imageWidth / IMAGE_SCALE, imageHeight
+                                / IMAGE_SCALE);
+                        Log.e("lmf", ">>>>>>>imageWidth / IMAGE_SCALE>>>>>>>>>>" + imageWidth
+                                );
+                        Log.e("lmf", ">>>>>>>imageHeight / IMAGE_SCALE>>>>>>>>>>" + imageHeight
+                                );
+                        Log.e("lmf", ">>>>>>>imageWidth / IMAGE_SCALE>>>>>>>>>>" + imageWidth
+                                / IMAGE_SCALE
+                                );
+                        Log.e("lmf", ">>>>>>>imageHeight / IMAGE_SCALE>>>>>>>>>>" + imageHeight
+                                / IMAGE_SCALE
+                                );
+                        Log.e("lmf", ">>>>>>>scaleFactor>>>>>>>>>>" + scaleFactor);
                         // Decode the image file into a Bitmap sized to fill the
                         // View
                         factoryOptions.inJustDecodeBounds = false;
@@ -317,9 +278,15 @@ public class AddActivity extends BaseActivity implements OnClickListener {
                             mAddAdapter.setList(mBitmapList);
                             mEditGv.setAdapter(mAddAdapter);
                         }
+
                         FileDataInfo info = new FileDataInfo();
                         info.setFileType(FileData.FILE_TYPE_EMOTION);
                         info.setUri(filePath);
+                        File fileThumb = BaseUtil.saveBitmapFile(mContext, bitmap);
+                        if (fileThumb != null) {
+                            info.setThumbUri(fileThumb.getPath());
+                        }
+
                         info.setType(FileData.TYPE_IMAGE);
                         info.setStatus(FileData.STATUS_LOCAL);
 
