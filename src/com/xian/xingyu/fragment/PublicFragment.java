@@ -1,5 +1,8 @@
 package com.xian.xingyu.fragment;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -23,9 +26,6 @@ import com.xian.xingyu.R;
 import com.xian.xingyu.activity.EmotionActivity;
 import com.xian.xingyu.activity.MainActivity;
 import com.xian.xingyu.adapter.PublicAdapter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class PublicFragment extends Fragment
         implements
@@ -94,18 +94,6 @@ public class PublicFragment extends Fragment
         mListView.addFooterView(mListBtmRl);
 
 
-        // mListBtmTv = new TextView(getActivity());
-        // mListBtmTv.setText("更多");
-        // mListBtmTv.setOnClickListener(new OnClickListener() {
-        //
-        // @Override
-        // public void onClick(View v) {
-        // // TODO Auto-generated method stub
-        // loadTestData();
-        // }
-        // });
-        // mListView.addFooterView(mListBtmTv);
-
         mPublicAdapter = new PublicAdapter(getActivity());
         mPublicAdapter.setList(mDataList);
         mListView.setAdapter(mPublicAdapter);
@@ -115,19 +103,19 @@ public class PublicFragment extends Fragment
     }
 
     private void initListener() {
-        
+
         mListView.setOnItemClickListener(new OnItemClickListener() {
-            
+
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // TODO Auto-generated method stub
                 Log.e("lmf", ">>>>>>>>>>onItemClick>>>>>>>>>");
                 mActivity.startActivity(new Intent(mActivity, EmotionActivity.class));
-                mActivity.overridePendingTransition(R.anim.slide_in_right,
-                        R.anim.slide_out_left);
+                mActivity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
         });
     }
+
     private void initTestData() {
         mDataList = new ArrayList<Integer>();
         for (int i = 100; i < 110; i++) {
@@ -264,7 +252,6 @@ public class PublicFragment extends Fragment
         }
 
     }
-
 
 
 

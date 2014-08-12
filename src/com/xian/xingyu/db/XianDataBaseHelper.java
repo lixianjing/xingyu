@@ -1,4 +1,3 @@
-
 package com.xian.xingyu.db;
 
 import android.content.Context;
@@ -80,33 +79,38 @@ public class XianDataBaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE " + DBInfo.Personal.TABLE + " (" + DBInfo.Personal._ID
                 + " INTEGER PRIMARY KEY," + DBInfo.Personal.ICON + " BLOB,"
                 + DBInfo.Personal.ICON_URI + " TEXT," + DBInfo.Personal.ICON_THUMB + " BLOB,"
-                + DBInfo.Personal.ICON_THUMB_URI + " TEXT,"
-                + DBInfo.Personal.NAME + " TEXT," + DBInfo.Personal.DESC + " TEXT,"
-                + DBInfo.Personal.GENDER + " INTEGER DEFAULT 0," + DBInfo.Personal.LOCAL + " TEXT,"
-                + DBInfo.Personal.BIRTH_YEAR + " INTEGER," + DBInfo.Personal.BIRTH_MONTH
-                + " INTEGER," + DBInfo.Personal.BIRTH_DAY + " INTEGER,"
-                + DBInfo.Personal.BIRTH_TYPE + " INTEGER DEFAULT 0);");
+                + DBInfo.Personal.ICON_THUMB_URI + " TEXT," + DBInfo.Personal.NAME + " TEXT,"
+                + DBInfo.Personal.DESC + " TEXT," + DBInfo.Personal.GENDER + " INTEGER DEFAULT 0,"
+                + DBInfo.Personal.LOCAL + " TEXT," + DBInfo.Personal.BIRTH_YEAR + " INTEGER,"
+                + DBInfo.Personal.BIRTH_MONTH + " INTEGER," + DBInfo.Personal.BIRTH_DAY
+                + " INTEGER," + DBInfo.Personal.BIRTH_TYPE + " INTEGER DEFAULT 0);");
 
         db.execSQL("CREATE TABLE " + DBInfo.Emotion.TABLE + " (" + DBInfo.Emotion._ID
                 + " INTEGER PRIMARY KEY," + DBInfo.Emotion.SUBJECT + " TEXT,"
                 + DBInfo.Emotion.CONTENT + " TEXT," + DBInfo.Emotion.STAMP + " INTEGER,"
-                + DBInfo.Emotion.LOCAL + " TEXT,"
-                + DBInfo.Emotion.LOCAL_GPS + " TEXT," + DBInfo.Emotion.TYPE + " INTEGER DEFAULT 0,"
-                + DBInfo.Emotion.STATUS + " INTEGER DEFAULT 0," + DBInfo.Emotion.HAS_PIC
-                + " INTEGER DEFAULT 0,"
+                + DBInfo.Emotion.LOCAL + " TEXT," + DBInfo.Emotion.LOCAL_GPS + " TEXT,"
+                + DBInfo.Emotion.TYPE + " INTEGER DEFAULT 0," + DBInfo.Emotion.STATUS
+                + " INTEGER DEFAULT 0," + DBInfo.Emotion.HAS_PIC + " INTEGER DEFAULT 0,"
                 + DBInfo.Emotion.COMMENT_COUNT + " INTEGER DEFAULT 0," + DBInfo.Emotion.FAV_COUNT
                 + " INTEGER DEFAULT 0," + DBInfo.Emotion.USER_TOKEN + " TEXT);");
 
         db.execSQL("CREATE TABLE " + DBInfo.FileData.TABLE + " (" + DBInfo.FileData._ID
                 + " INTEGER PRIMARY KEY," + DBInfo.FileData.FILE_TYPE + " INTEGER,"
                 + DBInfo.FileData.FILE_ID + " INTEGER," + DBInfo.FileData.MIME + " TEXT,"
-                + DBInfo.FileData.URI + " TEXT,"
-                + DBInfo.FileData.THUMB_URI + " TEXT," + DBInfo.FileData.SIZE
-                + " INTEGER DEFAULT 0,"
-                + DBInfo.FileData.POS + " INTEGER DEFAULT 0," + DBInfo.FileData.TYPE
-                + " INTEGER DEFAULT 0,"
-                + DBInfo.FileData.STATUS + " INTEGER DEFAULT 0," + DBInfo.FileData.SEQ
-                + " TEXT );");
+                + DBInfo.FileData.URI + " TEXT," + DBInfo.FileData.THUMB_URI + " TEXT,"
+                + DBInfo.FileData.SIZE + " INTEGER DEFAULT 0," + DBInfo.FileData.POS
+                + " INTEGER DEFAULT 0," + DBInfo.FileData.TYPE + " INTEGER DEFAULT 0,"
+                + DBInfo.FileData.STATUS + " INTEGER DEFAULT 0," + DBInfo.FileData.SEQ + " TEXT );");
+
+
+        db.execSQL("CREATE TABLE " + DBInfo.PublicShow.TABLE + " (" + DBInfo.PublicShow._ID
+                + " INTEGER PRIMARY KEY," + DBInfo.PublicShow.CONTENT + " TEXT,"
+                + DBInfo.PublicShow.STAMP + " INTEGER," + DBInfo.PublicShow.TYPE + " INTEGER,"
+                + DBInfo.PublicShow.HAS_PIC + " INTEGER," + DBInfo.PublicShow.COMMENT_COUNT
+                + " INTEGER DEFAULT 0," + DBInfo.PublicShow.FAV_COUNT + " INTEGER DEFAULT 0,"
+                + DBInfo.PublicShow.PIC_URI + " TEXT," + DBInfo.PublicShow.TOKEN + " TEXT);");
+
+
 
     }
 

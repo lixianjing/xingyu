@@ -10,23 +10,24 @@
         android:layout_height="44dip"
         layout="@layout/head_viewpage" />
 
-    <FrameLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
-
-        <android.support.v4.view.ViewPager
-            android:id="@+id/main_viewpager"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:persistentDrawingCache="animation" >
-        </android.support.v4.view.ViewPager>
 
         <include
             android:id="@+id/main_tabs"
             android:layout_width="match_parent"
             android:layout_height="44dip"
-            android:layout_gravity="bottom"
+            android:layout_alignParentBottom="true"
             layout="@layout/tabs" />
-    </FrameLayout>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/main_viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/main_tabs"
+            android:persistentDrawingCache="animation" >
+        </android.support.v4.view.ViewPager>
+    </RelativeLayout>
 
 </LinearLayout>

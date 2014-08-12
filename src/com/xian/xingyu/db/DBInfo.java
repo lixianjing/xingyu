@@ -1,4 +1,3 @@
-
 package com.xian.xingyu.db;
 
 import android.net.Uri;
@@ -35,10 +34,9 @@ public class DBInfo {
 
         public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + TABLE);
 
-        public static final String[] COLUMNS = new String[] {
-                _ID, ICON, ICON_URI, ICON_THUMB, ICON_THUMB_URI,
-                NAME, DESC, GENDER, LOCAL, BIRTH_YEAR, BIRTH_MONTH, BIRTH_DAY, BIRTH_TYPE
-        };
+        public static final String[] COLUMNS = new String[] {_ID, ICON, ICON_URI, ICON_THUMB,
+                ICON_THUMB_URI, NAME, DESC, GENDER, LOCAL, BIRTH_YEAR, BIRTH_MONTH, BIRTH_DAY,
+                BIRTH_TYPE};
 
         public static final int INDEX_ID = 0;
         public static final int INDEX_ICON = 1;
@@ -88,10 +86,8 @@ public class DBInfo {
 
         public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + TABLE);
 
-        public static final String[] COLUMNS = new String[] {
-                _ID, SUBJECT, CONTENT, STAMP, LOCAL,
-                LOCAL_GPS, TYPE, STATUS, HAS_PIC, COMMENT_COUNT, FAV_COUNT, USER_TOKEN
-        };
+        public static final String[] COLUMNS = new String[] {_ID, SUBJECT, CONTENT, STAMP, LOCAL,
+                LOCAL_GPS, TYPE, STATUS, HAS_PIC, COMMENT_COUNT, FAV_COUNT, USER_TOKEN};
 
         public static final int INDEX_ID = 0;
         public static final int INDEX_SUBJECT = 1;
@@ -139,10 +135,8 @@ public class DBInfo {
 
         public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + TABLE);
 
-        public static final String[] COLUMNS = new String[] {
-                _ID, FILE_TYPE, FILE_ID, MIME, URI, THUMB_URI,
-                SIZE, POS, TYPE, STATUS, SEQ
-        };
+        public static final String[] COLUMNS = new String[] {_ID, FILE_TYPE, FILE_ID, MIME, URI,
+                THUMB_URI, SIZE, POS, TYPE, STATUS, SEQ};
 
         public static final int INDEX_ID = 0;
         public static final int INDEX_FILE_TYPE = 1;
@@ -155,6 +149,47 @@ public class DBInfo {
         public static final int INDEX_TYPE = 8;
         public static final int INDEX_STATUS = 9;
         public static final int INDEX_SEQ = 10;
+
+    }
+
+
+
+    public static final class PublicShow implements BaseColumns {
+
+        public static final String TABLE = "PublicShow";
+
+        public static final String CONTENT = "content";
+        public static final String STAMP = "stamp";
+        // 秘密消息类型
+        public static final String TYPE = "type";
+        // 这条感情是否包含 照片
+        public static final String HAS_PIC = "has_pic";
+        public static final String COMMENT_COUNT = "comment_count";
+        public static final String FAV_COUNT = "fav_count";
+        public static final String PIC_URI = "PIC_URI";
+
+        public static final String TOKEN = "token";
+
+        public static final int TYPE_PUBLIC = 0;
+        public static final int TYPE_STORY = 1;
+
+
+        public static final int HAS_PIC_IS = 1;
+
+        public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + TABLE);
+
+        public static final String[] COLUMNS = new String[] {_ID, CONTENT, STAMP, TYPE, HAS_PIC,
+                COMMENT_COUNT, FAV_COUNT, PIC_URI, TOKEN};
+
+        public static final int INDEX_ID = 0;
+        public static final int INDEX_CONTENT = 1;
+        public static final int INDEX_STAMP = 2;
+        public static final int INDEX_TYPE = 3;
+        public static final int INDEX_HAS_PIC = 4;
+        public static final int INDEX_COMMENT_COUNT = 5;
+        public static final int INDEX_FAV_COUNT = 6;
+        public static final int INDEX_PIC_URI = 7;
+        public static final int INDEX_USER_TOKEN = 8;
 
     }
 
