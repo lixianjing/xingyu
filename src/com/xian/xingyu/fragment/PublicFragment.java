@@ -1,6 +1,5 @@
 package com.xian.xingyu.fragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
@@ -22,33 +21,41 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.xian.xingyu.MainApp;
 import com.xian.xingyu.R;
+import com.xian.xingyu.activity.AddActivity;
 import com.xian.xingyu.activity.EmotionActivity;
 import com.xian.xingyu.activity.MainActivity;
 import com.xian.xingyu.adapter.PublicAdapter;
+import com.xian.xingyu.bean.EmotionInfo;
+import com.xian.xingyu.db.DBManager;
 
 public class PublicFragment extends Fragment
         implements
             OnClickListener,
             SwipeRefreshLayout.OnRefreshListener {
 
-    private static final String TAG = "PublicFragment";
+    private static final String TAG = "PrivateFragment";
+
     public static final int TYPE_LOAD_FORWARD = 0;
     public static final int TYPE_LOAD_BACKWARD = 1;
 
+    // 分页 显示
+    public static final int LOAD_ITEM_COUNT = 20;
+    private int loadCount;
+
+    public static final int MSG_LOAD_FORWARD = 1001;
 
     private MainActivity mActivity;
     private SwipeRefreshLayout mSwipeLayout;
     private ListView mListView;
-    private TextView mTextView;
+    private TextView mTitleTv;
     private TextView mListBtmTv;
     private RelativeLayout mListBtmRl;
     private LinearLayout mListBtmProgressLayout;
 
-    private List<Integer> mDataList;
-
-
     private PublicAdapter mPublicAdapter;
+    private DBManager mDBManager;
 
     public PublicFragment() {
         setRetainInstance(true);
@@ -58,15 +65,16 @@ public class PublicFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // construct the RelativeLayout
         Log.e(TAG, ">>>onCreateView>>>>>>>>>>>>>");
+
         View view = inflater.inflate(R.layout.fragment_public, null);
+
+        mTitleTv = (TextView) view.findViewById(R.id.pub_title_tv);
+
         mSwipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.pub_srl);
         mSwipeLayout.setOnRefreshListener(this);
         mSwipeLayout.setColorScheme(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light, android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
-
-
-        initTestData();
 
         mListView = (ListView) view.findViewById(R.id.pub_lv);
 
@@ -87,22 +95,19 @@ public class PublicFragment extends Fragment
                 if (mListBtmProgressLayout.getVisibility() == View.VISIBLE) return;
                 mListBtmTv.setVisibility(View.GONE);
                 mListBtmProgressLayout.setVisibility(View.VISIBLE);
-                new LoadDataAsyncTask(TYPE_LOAD_BACKWARD).execute(mDataList.get(mDataList.size() - 1));
+                startLoadData(TYPE_LOAD_BACKWARD);
 
             }
         });
         mListView.addFooterView(mListBtmRl);
 
-
-        mPublicAdapter = new PublicAdapter(getActivity());
-        mPublicAdapter.setList(mDataList);
-        mListView.setAdapter(mPublicAdapter);
         initListener();
-
+        startLoadData(TYPE_LOAD_FORWARD);
         return view;
     }
 
     private void initListener() {
+        mTitleTv.setOnClickListener(this);
 
         mListView.setOnItemClickListener(new OnItemClickListener() {
 
@@ -116,14 +121,6 @@ public class PublicFragment extends Fragment
         });
     }
 
-    private void initTestData() {
-        mDataList = new ArrayList<Integer>();
-        for (int i = 100; i < 110; i++) {
-            mDataList.add(i);
-        }
-    }
-
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -132,6 +129,20 @@ public class PublicFragment extends Fragment
     @Override
     public void onClick(View v) {
         // TODO Auto-generated method stub
+        switch (v.getId()) {
+            case R.id.pub_title_tv:
+                if (MainApp.isLogin()) {
+                    Intent intent = new Intent(mActivity, AddActivity.class);
+                    mActivity.startActivity(intent);
+                } else {
+
+                    mActivity.showDialogLogin(true);
+                }
+                break;
+
+            default:
+                break;
+        }
     }
 
     @Override
@@ -160,6 +171,7 @@ public class PublicFragment extends Fragment
         // TODO Auto-generated method stub
         super.onStart();
         Log.e(TAG, ">>>onStart>>>>>>>>>>>>>");
+
     }
 
     @Override
@@ -169,14 +181,13 @@ public class PublicFragment extends Fragment
         Log.e(TAG, ">>>onStop>>>>>>>>>>>>>");
     }
 
-
-
     @Override
     public void onAttach(Activity activity) {
         // TODO Auto-generated method stub
         super.onAttach(activity);
         Log.e(TAG, ">>>onAttach>>>>>>>>>>>>>");
         mActivity = (MainActivity) activity;
+        mDBManager = DBManager.getInstance(activity);
     }
 
     @Override
@@ -190,13 +201,16 @@ public class PublicFragment extends Fragment
     public void onRefresh() {
         // TODO Auto-generated method stub
 
-        new LoadDataAsyncTask(TYPE_LOAD_FORWARD).execute(mDataList.get(0));
+        startLoadData(TYPE_LOAD_FORWARD);
 
     }
 
 
-    private class LoadDataAsyncTask extends AsyncTask<Integer, Void, List<Integer>> {
+    public void startLoadData(int type) {
+        new LoadDataAsyncTask(type).execute();
+    }
 
+    private class LoadDataAsyncTask extends AsyncTask<Void, Void, List<EmotionInfo>> {
 
         private final int type;
 
@@ -205,44 +219,30 @@ public class PublicFragment extends Fragment
         }
 
         @Override
-        protected List<Integer> doInBackground(Integer... arg0) {
+        protected void onPreExecute() {
             // TODO Auto-generated method stub
-
-
-            List<Integer> list = new ArrayList<Integer>();
-
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
-
-            if (type == TYPE_LOAD_FORWARD) {
-                for (int i = 11; i > 0; i--) {
-                    list.add(arg0[0] - i);
-                }
-            } else {
-                for (int i = 1; i < 11; i++) {
-                    list.add(arg0[0] + i);
-                }
-            }
-
-            return list;
+            super.onPreExecute();
         }
 
         @Override
-        protected void onPostExecute(List<Integer> result) {
+        protected void onPostExecute(List<EmotionInfo> result) {
             // TODO Auto-generated method stub
             super.onPostExecute(result);
+            if (result == null || result.size() == 0) {
+                loadCount = 0;
+                return;
+            }
 
-
+            if (mPublicAdapter == null) {
+                mPublicAdapter = new PublicAdapter(mActivity);
+                mPublicAdapter.setList(result);
+                mListView.setAdapter(mPublicAdapter);
+            } else {
+                mPublicAdapter.setList(result);
+            }
             if (type == TYPE_LOAD_FORWARD) {
-                mDataList.addAll(0, result);
                 mSwipeLayout.setRefreshing(false);
             } else {
-                mDataList.addAll(mDataList.size(), result);
                 mListBtmTv.setVisibility(View.VISIBLE);
                 mListBtmProgressLayout.setVisibility(View.GONE);
             }
@@ -251,8 +251,17 @@ public class PublicFragment extends Fragment
 
         }
 
+        @Override
+        protected List<EmotionInfo> doInBackground(Void... params) {
+            // TODO Auto-generated method stub
+
+            loadCount = loadCount + LOAD_ITEM_COUNT;
+
+            List<EmotionInfo> list = mDBManager.queryEmotion(loadCount);
+
+            return list;
+        }
+
     }
-
-
 
 }
