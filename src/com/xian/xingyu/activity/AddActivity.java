@@ -1,6 +1,10 @@
 
 package com.xian.xingyu.activity;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -29,10 +33,6 @@ import com.xian.xingyu.db.DBManager;
 import com.xian.xingyu.util.BaseUtil;
 import com.xian.xingyu.view.AddGridView;
 import com.xian.xingyu.view.CommonHeadView;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class AddActivity extends BaseActivity implements OnClickListener {
 
@@ -73,7 +73,7 @@ public class AddActivity extends BaseActivity implements OnClickListener {
     }
 
     private void initTitle() {
-        mHeadView = (CommonHeadView) findViewById(R.id.commonhead);
+        mHeadView = (CommonHeadView) findViewById(R.id.head_common);
         mHeadView.setTitle("编辑信息页面");
         mHeadView.setLeftText("取消", new View.OnClickListener() {
 

@@ -20,6 +20,7 @@ import com.xian.xingyu.R;
 import com.xian.xingyu.activity.MainActivity;
 import com.xian.xingyu.activity.PersonInfoActivity;
 import com.xian.xingyu.activity.SettingsActivity;
+import com.xian.xingyu.activity.SuggestActivity;
 import com.xian.xingyu.bean.PersonInfo;
 import com.xian.xingyu.util.BaseUtil;
 
@@ -169,10 +170,8 @@ public class DrawerView implements OnClickListener {
                 break;
             case R.id.left_btn3:
                 Log.e("lmf", ">>>>>>>>>>left_btn3>>>>>>>>>>>");
-                // mContext.startActivity(new Intent(activity,
-                // TestActivity.class));
-                // mContext.overridePendingTransition(R.anim.slide_in_right,
-                // R.anim.slide_out_left);
+                mActivity.startActivity(new Intent(mActivity, SuggestActivity.class));
+                mActivity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 break;
             case R.id.right_btn1:
                 Log.e("lmf", ">>>>>>>>>>right_btn1>>>>>>>>>>>");

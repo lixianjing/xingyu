@@ -18,26 +18,6 @@
         android:layout_weight="1"
         android:background="#FFFFFFFF"
         android:orientation="vertical" >
-
-        <EditText
-            android:id="@+id/suggest_message_et"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="意見或建議"
-            android:minLines="5" />
-
-        <EditText
-            android:id="@+id/suggest_contact_et"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="聯繫方式" />
-
-        <Button
-            android:id="@+id/suggest_send_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="发送" >
-        </Button>
     </LinearLayout>
 
 </LinearLayout>

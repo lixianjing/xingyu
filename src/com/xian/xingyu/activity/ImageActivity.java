@@ -1,4 +1,3 @@
-
 package com.xian.xingyu.activity;
 
 import android.os.Bundle;
@@ -8,7 +7,7 @@ import com.xian.xingyu.R;
 import com.xian.xingyu.base.BaseActivity;
 import com.xian.xingyu.view.CommonHeadView;
 
-public class TestActivity extends BaseActivity {
+public class ImageActivity extends BaseActivity {
 
     private CommonHeadView mHeadView;
 
@@ -16,7 +15,7 @@ public class TestActivity extends BaseActivity {
     protected void onCreate(Bundle arg0) {
         // TODO Auto-generated method stub
         super.onCreate(arg0);
-        setContentView(R.layout.test_activity);
+        setContentView(R.layout.image_activity);
         setNeedBackGesture(true);
 
         initTitle();
@@ -31,7 +30,7 @@ public class TestActivity extends BaseActivity {
 
     private void initTitle() {
         mHeadView = (CommonHeadView) findViewById(R.id.head_common);
-        mHeadView.setTitle("测试页面");
+        mHeadView.setTitle("图片页面");
         mHeadView.setLeftText("返回", new View.OnClickListener() {
 
             @Override

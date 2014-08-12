@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,24 +8,25 @@
         android:id="@+id/main_head"
         android:layout_width="match_parent"
         android:layout_height="44dip"
-        android:layout_alignParentTop="true"
         layout="@layout/head_viewpage" />
 
-    <include
-        android:id="@+id/main_tabs"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="44dip"
-        android:layout_alignParentBottom="true"
-        layout="@layout/tabs" />
+        android:layout_height="match_parent" >
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/main_viewpager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/main_tabs"
-        android:layout_below="@id/main_head"
-        android:flipInterval="30"
-        android:persistentDrawingCache="animation" >
-    </android.support.v4.view.ViewPager>
+        <android.support.v4.view.ViewPager
+            android:id="@+id/main_viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:persistentDrawingCache="animation" >
+        </android.support.v4.view.ViewPager>
 
-</RelativeLayout>
+        <include
+            android:id="@+id/main_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="44dip"
+            android:layout_gravity="bottom"
+            layout="@layout/tabs" />
+    </FrameLayout>
+
+</LinearLayout>

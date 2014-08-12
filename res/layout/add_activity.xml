@@ -6,7 +6,7 @@
     android:orientation="vertical" >
 
     <com.xian.xingyu.view.CommonHeadView
-        android:id="@+id/commonhead"
+        android:id="@+id/head_common"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0" >

@@ -56,6 +56,14 @@
             android:name=".activity.EmotionActivity"
             android:screenOrientation="portrait" >
         </activity>
+        <activity
+            android:name=".activity.ImageActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.SuggestActivity"
+            android:screenOrientation="portrait" >
+        </activity>
 
         <provider
             android:name="com.xian.xingyu.db.XianProvider"
