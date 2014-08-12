@@ -313,12 +313,15 @@ public class BaseUtil {
 
     }
 
-    public static Bitmap getBitmapFromPath(String path) {
+    public static Bitmap getBitmapFromName(Context context, String name) {
+        String path = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath()
+                + "/" + name;
 
         BitmapFactory.Options factoryOptions = new BitmapFactory.Options();
 
         factoryOptions.inJustDecodeBounds = false;
         factoryOptions.inPurgeable = true;
+
 
         return BitmapFactory.decodeFile(path, factoryOptions);
     }

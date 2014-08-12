@@ -32,14 +32,6 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".activity.TestActivity"
-            android:screenOrientation="portrait" >
-        </activity>
-        <activity
-            android:name=".activity.SecondActivity"
-            android:screenOrientation="portrait" >
-        </activity>
-        <activity
             android:name=".activity.PersonInfoActivity"
             android:screenOrientation="portrait" >
         </activity>

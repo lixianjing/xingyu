@@ -1,7 +1,5 @@
 package com.xian.xingyu.view;
 
-import java.util.List;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -20,15 +18,17 @@ import com.xian.xingyu.activity.ImageActivity;
 import com.xian.xingyu.bean.FileDataInfo;
 import com.xian.xingyu.util.BaseUtil;
 
+import java.util.List;
+
 
 public class ImageScrollView extends HorizontalScrollView implements View.OnClickListener {
 
 
     private static final int IMAGE_SIZE = 150;
 
-    private Context mContext;
+    private final Context mContext;
 
-    private LinearLayout mLinearLayout;
+    private final LinearLayout mLinearLayout;
     private List<FileDataInfo> mList;
     private Activity mActivity;
 
@@ -80,7 +80,7 @@ public class ImageScrollView extends HorizontalScrollView implements View.OnClic
 
             ImageView iv = (ImageView) mLinearLayout.getChildAt(i);
 
-            Bitmap bitmap = BaseUtil.getBitmapFromPath(dataInfo.getThumbUri());
+            Bitmap bitmap = BaseUtil.getBitmapFromName(mContext, dataInfo.getThumbUri());
             iv.setImageBitmap(bitmap);
 
 

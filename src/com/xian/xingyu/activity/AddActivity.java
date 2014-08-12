@@ -1,10 +1,6 @@
 
 package com.xian.xingyu.activity;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -33,6 +29,10 @@ import com.xian.xingyu.db.DBManager;
 import com.xian.xingyu.util.BaseUtil;
 import com.xian.xingyu.view.AddGridView;
 import com.xian.xingyu.view.CommonHeadView;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AddActivity extends BaseActivity implements OnClickListener {
 
@@ -241,6 +241,10 @@ public class AddActivity extends BaseActivity implements OnClickListener {
                     if (!TextUtils.isEmpty(filePath)) {
                         Log.d(LOG_TAG, "data IS null, file saved on target position.");
 
+                        File file = new File(filePath);
+                        if (!file.exists() || !file.isFile())
+                            return;
+
                         BitmapFactory.Options factoryOptions = new BitmapFactory.Options();
 
                         factoryOptions.inJustDecodeBounds = true;
@@ -281,10 +285,10 @@ public class AddActivity extends BaseActivity implements OnClickListener {
 
                         FileDataInfo info = new FileDataInfo();
                         info.setFileType(FileData.FILE_TYPE_EMOTION);
-                        info.setUri(filePath);
+                        info.setUri(file.getName());
                         File fileThumb = BaseUtil.saveBitmapFile(mContext, bitmap);
                         if (fileThumb != null) {
-                            info.setThumbUri(fileThumb.getPath());
+                            info.setThumbUri(fileThumb.getName());
                         }
 
                         info.setType(FileData.TYPE_IMAGE);

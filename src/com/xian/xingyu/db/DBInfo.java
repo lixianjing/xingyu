@@ -169,6 +169,9 @@ public class DBInfo {
         public static final String PIC_URI = "PIC_URI";
 
         public static final String TOKEN = "token";
+        public static final String USER_NAME = "user_name";
+        public static final String USER_ICON = "user_icon";
+        public static final String USER_TOKEN = "user_token";
 
         public static final int TYPE_PUBLIC = 0;
         public static final int TYPE_STORY = 1;
@@ -179,7 +182,8 @@ public class DBInfo {
         public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + TABLE);
 
         public static final String[] COLUMNS = new String[] {_ID, CONTENT, STAMP, TYPE, HAS_PIC,
-                COMMENT_COUNT, FAV_COUNT, PIC_URI, TOKEN};
+                COMMENT_COUNT, FAV_COUNT, PIC_URI, TOKEN, USER_NAME, USER_ICON, USER_TOKEN
+        };
 
         public static final int INDEX_ID = 0;
         public static final int INDEX_CONTENT = 1;
@@ -189,8 +193,10 @@ public class DBInfo {
         public static final int INDEX_COMMENT_COUNT = 5;
         public static final int INDEX_FAV_COUNT = 6;
         public static final int INDEX_PIC_URI = 7;
-        public static final int INDEX_USER_TOKEN = 8;
-
+        public static final int INDEX_TOKEN = 8;
+        public static final int INDEX_USER_NAME = 9;
+        public static final int INDEX_USER_ICON = 10;
+        public static final int INDEX_USER_TOKEN = 11;
     }
 
 }
