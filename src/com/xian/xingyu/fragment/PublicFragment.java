@@ -1,10 +1,12 @@
 package com.xian.xingyu.fragment;
 
-import java.util.List;
+import org.espier.messages.util.AsyncWeakHandlerTemplate;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -14,6 +16,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.LinearLayout;
@@ -27,7 +30,7 @@ import com.xian.xingyu.activity.AddActivity;
 import com.xian.xingyu.activity.EmotionActivity;
 import com.xian.xingyu.activity.MainActivity;
 import com.xian.xingyu.adapter.PublicAdapter;
-import com.xian.xingyu.bean.EmotionInfo;
+import com.xian.xingyu.db.DBInfo;
 import com.xian.xingyu.db.DBManager;
 
 public class PublicFragment extends Fragment
@@ -35,7 +38,8 @@ public class PublicFragment extends Fragment
             OnClickListener,
             SwipeRefreshLayout.OnRefreshListener {
 
-    private static final String TAG = "PrivateFragment";
+    private static final String TAG = "PublicFragment";
+    private static final int MESSAGE_LIST_QUERY_TOKEN = 1001;
 
     public static final int TYPE_LOAD_FORWARD = 0;
     public static final int TYPE_LOAD_BACKWARD = 1;
@@ -56,6 +60,7 @@ public class PublicFragment extends Fragment
 
     private PublicAdapter mPublicAdapter;
     private DBManager mDBManager;
+    private BackgroundQueryHandler mBackgroundQueryHandler;
 
     public PublicFragment() {
         setRetainInstance(true);
@@ -95,14 +100,19 @@ public class PublicFragment extends Fragment
                 if (mListBtmProgressLayout.getVisibility() == View.VISIBLE) return;
                 mListBtmTv.setVisibility(View.GONE);
                 mListBtmProgressLayout.setVisibility(View.VISIBLE);
-                startLoadData(TYPE_LOAD_BACKWARD);
+                startMsgListQuery(TYPE_LOAD_BACKWARD);
 
             }
         });
         mListView.addFooterView(mListBtmRl);
 
+
+        mPublicAdapter = new PublicAdapter(getActivity(), null, mListView, true, null);
+        mPublicAdapter.setOnDataSetChangedListener(mDataSetChangedListener);
+        mListView.setAdapter(mPublicAdapter);
+
         initListener();
-        startLoadData(TYPE_LOAD_FORWARD);
+        startMsgListQuery(TYPE_LOAD_FORWARD);
         return view;
     }
 
@@ -201,65 +211,74 @@ public class PublicFragment extends Fragment
     public void onRefresh() {
         // TODO Auto-generated method stub
 
-        startLoadData(TYPE_LOAD_FORWARD);
+        startMsgListQuery(TYPE_LOAD_FORWARD);
+
+    }
+
+    private final PublicAdapter.OnDataSetChangedListener mDataSetChangedListener =
+            new PublicAdapter.OnDataSetChangedListener() {
+                @Override
+                public void onDataSetChanged(PublicAdapter adapter) {
+                    // mPossiblePendingNotification = true;
+                }
+
+                @Override
+                public void onContentChanged(PublicAdapter adapter) {
+                    startMsgListQuery(TYPE_LOAD_FORWARD);
+                }
+            };
+
+    private void startMsgListQuery(int type) {
+
+        mBackgroundQueryHandler.cancelOperation(MESSAGE_LIST_QUERY_TOKEN);
+        mListView.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_NORMAL);
+
+        Uri uri = DBInfo.PublicShow.CONTENT_URI;
+
+        mBackgroundQueryHandler.startQuery(MESSAGE_LIST_QUERY_TOKEN, null, uri,
+                DBInfo.PublicShow.COLUMNS, null, null, DBInfo.PublicShow.STAMP);
 
     }
 
 
-    public void startLoadData(int type) {
-        new LoadDataAsyncTask(type).execute();
-    }
-
-    private class LoadDataAsyncTask extends AsyncTask<Void, Void, List<EmotionInfo>> {
-
-        private final int type;
-
-        public LoadDataAsyncTask(int type) {
-            this.type = type;
+    private final static class BackgroundQueryHandler
+            extends AsyncWeakHandlerTemplate<PublicFragment> {
+        public BackgroundQueryHandler(ContentResolver contentResolver) {
+            super(contentResolver);
         }
 
         @Override
-        protected void onPreExecute() {
-            // TODO Auto-generated method stub
-            super.onPreExecute();
-        }
-
-        @Override
-        protected void onPostExecute(List<EmotionInfo> result) {
-            // TODO Auto-generated method stub
-            super.onPostExecute(result);
-            if (result == null || result.size() == 0) {
-                loadCount = 0;
+        protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+            final PublicFragment o = getObject();
+            if (o == null) {
                 return;
             }
 
-            if (mPublicAdapter == null) {
-                mPublicAdapter = new PublicAdapter(mActivity);
-                mPublicAdapter.setList(result);
-                mListView.setAdapter(mPublicAdapter);
-            } else {
-                mPublicAdapter.setList(result);
+
+            switch (token) {
+                case MESSAGE_LIST_QUERY_TOKEN:
+
+                    // Once we have completed the query for the message history, if
+                    // there is nothing in the cursor and we are not composing a new
+                    // message, we must be editing a draft in a new conversation
+                    // (unless
+                    // mSentMessage is true).
+                    // Show the recipients editor to give the user a chance to add
+                    // more people before the conversation begins.
+
+                    // FIXME: freshing layout changes the focused view to an
+                    // unexpected
+                    // one, set it back to TextEditor forcely.
+
+                    o.mPublicAdapter.changeCursor(cursor);
+
+
+                    break;
+
+                default:
+                    break;
             }
-            if (type == TYPE_LOAD_FORWARD) {
-                mSwipeLayout.setRefreshing(false);
-            } else {
-                mListBtmTv.setVisibility(View.VISIBLE);
-                mListBtmProgressLayout.setVisibility(View.GONE);
-            }
 
-            mPublicAdapter.notifyDataSetChanged();
-
-        }
-
-        @Override
-        protected List<EmotionInfo> doInBackground(Void... params) {
-            // TODO Auto-generated method stub
-
-            loadCount = loadCount + LOAD_ITEM_COUNT;
-
-            List<EmotionInfo> list = mDBManager.queryEmotion(loadCount);
-
-            return list;
         }
 
     }

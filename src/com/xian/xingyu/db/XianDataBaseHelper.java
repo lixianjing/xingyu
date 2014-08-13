@@ -1,5 +1,11 @@
-
 package com.xian.xingyu.db;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Random;
 
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -10,13 +16,6 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.xian.xingyu.util.BaseUtil;
-
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Random;
 
 public class XianDataBaseHelper extends SQLiteOpenHelper {
 
@@ -116,12 +115,13 @@ public class XianDataBaseHelper extends SQLiteOpenHelper {
                 + DBInfo.FileData.STATUS + " INTEGER DEFAULT 0," + DBInfo.FileData.SEQ + " TEXT );");
 
         db.execSQL("CREATE TABLE " + DBInfo.PublicShow.TABLE + " (" + DBInfo.PublicShow._ID
-                + " INTEGER PRIMARY KEY," + DBInfo.PublicShow.CONTENT + " TEXT,"
-                + DBInfo.PublicShow.STAMP + " INTEGER," + DBInfo.PublicShow.TYPE + " INTEGER,"
-                + DBInfo.PublicShow.HAS_PIC + " INTEGER," + DBInfo.PublicShow.COMMENT_COUNT
-                + " INTEGER DEFAULT 0," + DBInfo.PublicShow.FAV_COUNT + " INTEGER DEFAULT 0,"
-                + DBInfo.PublicShow.PIC_URI + " TEXT," + DBInfo.PublicShow.TOKEN + " TEXT ,"
-                + DBInfo.PublicShow.USER_NAME + " TEXT ," + DBInfo.PublicShow.USER_ICON + " TEXT ,"
+                + " INTEGER PRIMARY KEY," + DBInfo.PublicShow.SUBJECT + " TEXT,"
+                + DBInfo.PublicShow.CONTENT + " TEXT," + DBInfo.PublicShow.STAMP + " INTEGER,"
+                + DBInfo.PublicShow.TYPE + " INTEGER," + DBInfo.PublicShow.HAS_PIC + " INTEGER,"
+                + DBInfo.PublicShow.COMMENT_COUNT + " INTEGER DEFAULT 0,"
+                + DBInfo.PublicShow.FAV_COUNT + " INTEGER DEFAULT 0," + DBInfo.PublicShow.PIC_URI
+                + " TEXT," + DBInfo.PublicShow.TOKEN + " TEXT ," + DBInfo.PublicShow.USER_NAME
+                + " TEXT ," + DBInfo.PublicShow.USER_ICON + " TEXT ,"
                 + DBInfo.PublicShow.USER_TOKEN + " TEXT);");
 
     }
@@ -137,23 +137,19 @@ public class XianDataBaseHelper extends SQLiteOpenHelper {
     private void initTestData(SQLiteDatabase db) {
 
         String[] path = initTestImage();
-        if (path == null || path.length == 0)
-            return;
+        if (path == null || path.length == 0) return;
         int size = path.length;
         Random random = new Random();
         for (int i = 1; i < 11; i++) {
-            db.execSQL("INSERT INTO " + DBInfo.PublicShow.TABLE
-                    + " values (" + i
-                    + ",'testxxxxxxx',159425452374," + ((random.nextInt(10)) % 2) + ","
+            db.execSQL("INSERT INTO " + DBInfo.PublicShow.TABLE + " values (" + i
+                    + ",'subject','testxxxxxxx',159425452374," + ((random.nextInt(10)) % 2) + ","
                     + ((random.nextInt(10)) % 2) + ",888888,999999,'" + path[random.nextInt(size)]
+                    + "," + path[random.nextInt(size)] + "," + path[random.nextInt(size)] + ","
+                    + path[random.nextInt(size)] + "," + path[random.nextInt(size)] + ","
+                    + path[random.nextInt(size)] + "," + path[random.nextInt(size)]
+                    + path[random.nextInt(size)] + "," + path[random.nextInt(size)]
                     + "','','xianjing','" + path[random.nextInt(size)] + "','')");
 
-            for (int j = 1; j < 11; j++) {
-                db.execSQL(" insert into filedata (file_type,file_id,uri,thumb_uri) values(1," + i
-                        + ",'" + path[random.nextInt(size)]
-                        + "','" + path[random.nextInt(size)] + "')");
-
-            }
 
 
         }

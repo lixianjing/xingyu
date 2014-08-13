@@ -399,7 +399,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                 break;
             case R.id.head_viewpage_right_tv:
                 mViewPager.setCurrentItem(1);
-                mPrivateFragment.startLoadData(PrivateFragment.TYPE_LOAD_FORWARD);
                 break;
 
             case R.id.tab_left_rl:

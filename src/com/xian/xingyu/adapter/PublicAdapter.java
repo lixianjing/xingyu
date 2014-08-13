@@ -1,115 +1,177 @@
+/*
+ * Copyright (C) 2010~2014 limingfeng
+ *
+ * This file is a part of limingfeng apps.
+ *
+ * All rights reserved.
+ */
 
 package com.xian.xingyu.adapter;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
 
-import android.app.Activity;
+import android.content.Context;
+import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.TextView;
+import android.widget.AbsListView;
+import android.widget.CursorAdapter;
+import android.widget.ListView;
 
 import com.xian.xingyu.R;
-import com.xian.xingyu.bean.EmotionInfo;
-import com.xian.xingyu.bean.FileDataInfo;
-import com.xian.xingyu.db.DBInfo.Emotion;
-import com.xian.xingyu.view.ImageScrollView;
+import com.xian.xingyu.bean.PublicItem;
+import com.xian.xingyu.db.DBInfo;
+import com.xian.xingyu.view.PublicEmotionItem;
 
-public class PublicAdapter extends BaseAdapter {
+/**
+ * The back-end data adapter of a message list.
+ */
+public class PublicAdapter extends CursorAdapter {
+    private static final String TAG = "PublicAdapter";
 
-    private static SimpleDateFormat sFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    private Activity mActivity;
-    private LayoutInflater mInflater = null;
-    private List<EmotionInfo> mList;
+    private static final int CACHE_SIZE = 20;
 
-    public PublicAdapter(Activity context) {
-        mActivity = context;
-        mInflater = LayoutInflater.from(context);
-    }
+    protected LayoutInflater mInflater;
+    private final LinkedHashMap<Long, PublicItem> mMessageItemCache;
+    private OnDataSetChangedListener mOnDataSetChangedListener;
 
-    public List<EmotionInfo> getList() {
-        return mList;
-    }
+    private Context mContext;
 
-    public void setList(List<EmotionInfo> mList) {
-        this.mList = mList;
+
+
+    public PublicAdapter(Context context, Cursor c, ListView listView,
+            boolean useDefaultColumnsMap, Pattern highlight) {
+        super(context, c, false /* auto-requery */);
+        mContext = context;
+
+        mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mMessageItemCache = new LinkedHashMap<Long, PublicItem>(10, 1.0f, true) {
+            private static final long serialVersionUID = 0;
+
+            @Override
+            protected boolean removeEldestEntry(Map.Entry<Long, PublicItem> eldest) {
+                return size() > CACHE_SIZE;
+            }
+        };
+
+
+        listView.setRecyclerListener(new AbsListView.RecyclerListener() {
+            @Override
+            public void onMovedToScrapHeap(View view) {
+                if (view instanceof PublicEmotionItem) {
+                    PublicEmotionItem mli = (PublicEmotionItem) view;
+                    // Clear references to resources
+                    mli.unbind();
+                }
+            }
+        });
     }
 
     @Override
-    public int getCount() {
-        // TODO Auto-generated method stub
-        return mList.size();
-    }
+    public void bindView(View view, Context context, Cursor cursor) {
+        if (view instanceof PublicEmotionItem) {
+            long recordId = cursor.getLong(DBInfo.PublicShow.INDEX_ID);
 
-    @Override
-    public Object getItem(int position) {
-        // TODO Auto-generated method stub
-        return position;
-    }
-
-    @Override
-    public long getItemId(int position) {
-        // TODO Auto-generated method stub
-        return position;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        // TODO Auto-generated method stub
-        ViewHolder holder;
-        if (convertView == null) {
-
-            convertView = mInflater.inflate(R.layout.item_private, null, false);
-            holder = new ViewHolder();
-
-            holder.dateTv = (TextView) convertView.findViewById(R.id.item_private_date_tv);
-            holder.timeTv = (TextView) convertView.findViewById(R.id.item_private_time_tv);
-            holder.contentTv = (TextView) convertView.findViewById(R.id.item_private_content_tv);
-            holder.typeTv = (TextView) convertView.findViewById(R.id.item_private_type_tv);
-            holder.imageHsv =
-                    (ImageScrollView) convertView.findViewById(R.id.item_private_image_hsv);
-
-            convertView.setTag(holder);
-
-        } else {
-            holder = (ViewHolder) convertView.getTag();
-        }
-
-        EmotionInfo info = mList.get(position);
-
-        Date d1 = new Date(info.getStamp());
-        String t1 = sFormat.format(d1);
-        String[] dateStr = t1.split(" ");
-        holder.dateTv.setText(dateStr[0]);
-        holder.timeTv.setText(dateStr[1]);
-        holder.contentTv.setText(info.getContent());
-
-        if (info.getType() == Emotion.TYPE_PRIVATE) {
-            holder.typeTv.setText("私密");
-        } else {
-            holder.typeTv.setText("公开");
-        }
-        holder.imageHsv.setVisibility(View.GONE);
-        if (info.isHasPic()) {
-            List<FileDataInfo> list = info.getFileDateList();
-            if (list != null && list.size() > 0) {
-                holder.imageHsv.setVisibility(View.VISIBLE);
-                holder.imageHsv.loadData(list, mActivity);
-
+            PublicItem msgItem = getCachedMessageItem(recordId, cursor);
+            if (msgItem != null) {
+                PublicEmotionItem mli = (PublicEmotionItem) view;
+                mli.setAdapter(PublicAdapter.this);
+                mli.bind(mContext, msgItem);
             }
         }
-
-        return convertView;
     }
 
-    private class ViewHolder {
-        TextView dateTv, timeTv, contentTv, typeTv;
-        ImageScrollView imageHsv;
+    @Override
+    public int getViewTypeCount() {
+        return 2; // Incoming and outgoing messages
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        Cursor cursor = (Cursor) getItem(position);
+        return getItemViewType(cursor);
+    }
+
+    private int getItemViewType(Cursor cursor) {
+        return cursor.getInt(DBInfo.PublicShow.INDEX_TYPE);
+    }
+
+    public interface OnDataSetChangedListener {
+        void onDataSetChanged(PublicAdapter adapter);
+
+        void onContentChanged(PublicAdapter adapter);
+    }
+
+    public void setOnDataSetChangedListener(OnDataSetChangedListener l) {
+        mOnDataSetChangedListener = l;
+    }
+
+
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+
+        mMessageItemCache.clear();
+
+        if (mOnDataSetChangedListener != null) {
+            mOnDataSetChangedListener.onDataSetChanged(this);
+        }
+
 
     }
+
+    @Override
+    public void changeCursor(Cursor cursor) {
+        // mHasLastEms = false;
+        super.changeCursor(cursor);
+    }
+
+    @Override
+    protected void onContentChanged() {
+        if (getCursor() != null && !getCursor().isClosed()) {
+            if (mOnDataSetChangedListener != null) {
+                mOnDataSetChangedListener.onContentChanged(this);
+            }
+        }
+    }
+
+    @Override
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        View view =
+                mInflater.inflate(getItemViewType(cursor) == DBInfo.PublicShow.TYPE_EMOTION
+                        ? R.layout.item_public_emotion
+                        : R.layout.item_public_story, parent, false);
+
+        view.setWillNotCacheDrawing(true);
+        view.setDrawingCacheEnabled(false);
+
+        return view;
+
+    }
+
+    public PublicItem getCachedMessageItem(long recordId, Cursor c) {
+        PublicItem item = mMessageItemCache.get(recordId);
+        if (item == null && c != null && isCursorValid(c)) {
+            item = new PublicItem(mContext, c);
+            mMessageItemCache.put(recordId, item);
+        }
+
+        return item;
+    }
+
+    private boolean isCursorValid(Cursor cursor) {
+        // Check whether the cursor is valid or not.
+        if (cursor.isClosed() || cursor.isBeforeFirst() || cursor.isAfterLast()) {
+            return false;
+        }
+        return true;
+    }
+
+
 
 }

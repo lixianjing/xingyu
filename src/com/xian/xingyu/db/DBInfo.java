@@ -158,6 +158,7 @@ public class DBInfo {
 
         public static final String TABLE = "PublicShow";
 
+        public static final String SUBJECT = "subject";
         public static final String CONTENT = "content";
         public static final String STAMP = "stamp";
         // 秘密消息类型
@@ -166,14 +167,14 @@ public class DBInfo {
         public static final String HAS_PIC = "has_pic";
         public static final String COMMENT_COUNT = "comment_count";
         public static final String FAV_COUNT = "fav_count";
-        public static final String PIC_URI = "PIC_URI";
+        public static final String PIC_URI = "pic_uri";
 
         public static final String TOKEN = "token";
         public static final String USER_NAME = "user_name";
         public static final String USER_ICON = "user_icon";
         public static final String USER_TOKEN = "user_token";
 
-        public static final int TYPE_PUBLIC = 0;
+        public static final int TYPE_EMOTION = 0;
         public static final int TYPE_STORY = 1;
 
 
@@ -181,22 +182,24 @@ public class DBInfo {
 
         public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + TABLE);
 
-        public static final String[] COLUMNS = new String[] {_ID, CONTENT, STAMP, TYPE, HAS_PIC,
+        public static final String[] COLUMNS =
+                new String[] {_ID, SUBJECT, CONTENT, STAMP, TYPE, HAS_PIC,
                 COMMENT_COUNT, FAV_COUNT, PIC_URI, TOKEN, USER_NAME, USER_ICON, USER_TOKEN
         };
 
         public static final int INDEX_ID = 0;
-        public static final int INDEX_CONTENT = 1;
-        public static final int INDEX_STAMP = 2;
-        public static final int INDEX_TYPE = 3;
-        public static final int INDEX_HAS_PIC = 4;
-        public static final int INDEX_COMMENT_COUNT = 5;
-        public static final int INDEX_FAV_COUNT = 6;
-        public static final int INDEX_PIC_URI = 7;
-        public static final int INDEX_TOKEN = 8;
-        public static final int INDEX_USER_NAME = 9;
-        public static final int INDEX_USER_ICON = 10;
-        public static final int INDEX_USER_TOKEN = 11;
+        public static final int INDEX_SUBJECT = 1;
+        public static final int INDEX_CONTENT = 2;
+        public static final int INDEX_STAMP = 3;
+        public static final int INDEX_TYPE = 4;
+        public static final int INDEX_HAS_PIC = 5;
+        public static final int INDEX_COMMENT_COUNT = 6;
+        public static final int INDEX_FAV_COUNT = 7;
+        public static final int INDEX_PIC_URI = 8;
+        public static final int INDEX_TOKEN = 9;
+        public static final int INDEX_USER_NAME = 10;
+        public static final int INDEX_USER_ICON = 11;
+        public static final int INDEX_USER_TOKEN = 12;
     }
 
 }
