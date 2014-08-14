@@ -14,9 +14,14 @@
 
 package com.xian.xingyu.view;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -24,12 +29,16 @@ import android.widget.TextView;
 
 import com.xian.xingyu.R;
 import com.xian.xingyu.bean.PublicItem;
+import com.xian.xingyu.util.BaseUtil;
 
 /**
  * This class provides view of a message in the messages list.
  */
 @SuppressLint({"NewApi", "ResourceAsColor"})
 public class PublicEmotionItem extends LinearLayout implements View.OnClickListener {
+
+
+    private static SimpleDateFormat sFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private Context mContext;
 
@@ -85,7 +94,19 @@ public class PublicEmotionItem extends LinearLayout implements View.OnClickListe
 
     private void bindCommonMessage(final PublicItem msgItem) {
 
+        Bitmap bitmap = BaseUtil.getBitmapFromName(mContext, msgItem.userIcon);
+        Log.e("lmf", ">>>>>>>>>>" + bitmap + ":" + msgItem.userIcon);
+        if (bitmap != null) {
+            iconIv.setImageBitmap(bitmap);
+        }
 
+        nameTv.setText(msgItem.userName);
+
+        Date d1 = new Date(msgItem.stamp);
+        String t1 = sFormat.format(d1);
+        dateTv.setText(t1);
+
+        contentTv.setText(msgItem.content);
 
         favCountTv.setText(msgItem.favCount + "");
         messageCountTv.setText(msgItem.commentCount + "");
