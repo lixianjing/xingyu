@@ -11,7 +11,7 @@
         android:orientation="horizontal" >
 
         <ImageView
-            android:id="@+id/item_public_icon_iv"
+            android:id="@+id/item_public_emotion_icon_iv"
             android:layout_width="44dip"
             android:layout_height="44dip" />
 
@@ -21,13 +21,13 @@
             android:orientation="vertical" >
 
             <TextView
-                android:id="@+id/item_public_name_tv"
+                android:id="@+id/item_public_emotion_name_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="李仙靖" />
 
             <TextView
-                android:id="@+id/item_public_date_tv"
+                android:id="@+id/item_public_emotion_date_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="今天 01:24" />
@@ -35,13 +35,13 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/item_public_content_tv"
+        android:id="@+id/item_public_emotion_content_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="信息" />
 
     <com.xian.xingyu.view.ImageScrollView
-        android:id="@+id/item_public_image_hsv"
+        android:id="@+id/item_public_emotion_image_hsv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:focusable="false"
@@ -54,14 +54,14 @@
         android:orientation="horizontal" >
 
         <TextView
-            android:id="@+id/item_public_message_tv"
-            android:layout_width="match_parent"
+            android:id="@+id/item_public_emotion_message_tv"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="留言" />
 
         <TextView
-            android:id="@+id/item_public_fav_tv"
-            android:layout_width="match_parent"
+            android:id="@+id/item_public_emotion_fav_tv"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="点赞" />
     </LinearLayout>

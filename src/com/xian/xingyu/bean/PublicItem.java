@@ -18,19 +18,19 @@ public class PublicItem {
 
     final Context mContext;
 
-    long id;
-    String subject;
-    String content;
-    long stamp;
-    int type;
-    boolean hasPic;
-    int commentCount;
-    int favCount;
-    String picUri;
-    String token;
-    String userName;
-    String userIcon;
-    String userToken;
+    public long id;
+    public String subject;
+    public String content;
+    public long stamp;
+    public int type;
+    public boolean hasPic;
+    public int commentCount;
+    public int favCount;
+    public String picUri;
+    public String token;
+    public String userName;
+    public String userIcon;
+    public String userToken;
 
 
     Cursor mCursor;

@@ -16,16 +16,16 @@ package com.xian.xingyu.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.xian.xingyu.R;
 import com.xian.xingyu.bean.PublicItem;
+import com.xian.xingyu.util.BaseUtil;
 
 /**
  * This class provides view of a message in the messages list.
@@ -40,19 +40,8 @@ public class PublicStoryItem extends LinearLayout implements View.OnClickListene
 
 
 
-    private TextView mTimeTv, mMessageTv;
-    private FrameLayout mBtmFl;
-    private LinearLayout mBtmBtnsLl;
-    private RelativeLayout mContentLl1, mContentLl2;
-    private Button mAllowBtn, mRejectBtn, mBlockBtn, mBtmOneBtn, mBtmTv, mTitleTv;
-
-
-    private TextView mRoomName, mRoomLanguage, mRoomSubject;
-
-    private TextView mPersonalName, mPersonalAge, mPersonalMood, mPersonalLine0, mPersonalLine1,
-            tv_line_content1, tv_line_content2;
-    private ImageView mIvSex, mIvRoom, mIvPersonal;
-
+    private TextView mContentTv, favCountTv, messageCountTv;
+    private ImageView mImageView;
 
 
 
@@ -72,47 +61,10 @@ public class PublicStoryItem extends LinearLayout implements View.OnClickListene
     protected void onFinishInflate() {
         // TODO Auto-generated method stub
         super.onFinishInflate();
-        mTimeTv = (TextView) findViewById(R.id.msg_notice_time_tv);
-        mMessageTv = (TextView) findViewById(R.id.msg_notice_message_tv);
-        mTitleTv = (Button) findViewById(R.id.msg_notice_title_tv);
-
-        mBtmFl = (FrameLayout) findViewById(R.id.msg_notice_btm_fl);
-        mContentLl1 = (RelativeLayout) findViewById(R.id.msg_notice_content1);
-        mContentLl2 = (RelativeLayout) findViewById(R.id.msg_notice_content2);
-
-        mBtmBtnsLl = (LinearLayout) findViewById(R.id.msg_notice_btm_btns_ll);
-        mAllowBtn = (Button) findViewById(R.id.msg_notice_btm_allow_btn);
-        mRejectBtn = (Button) findViewById(R.id.msg_notice_btm_reject_btn);
-        mBlockBtn = (Button) findViewById(R.id.msg_notice_btm_block_btn);
-        mBtmOneBtn = (Button) findViewById(R.id.msg_notice_btm_btn);
-        mBtmTv = (Button) findViewById(R.id.msg_notice_btm_tv);
-
-        mRoomName = (TextView) findViewById(R.id.message_room_name);
-        mRoomLanguage = (TextView) findViewById(R.id.message_language);
-        mRoomSubject = (TextView) findViewById(R.id.message_subject);
-        mIvRoom = (ImageView) findViewById(R.id.iv_room);
-
-
-        mPersonalName = (TextView) findViewById(R.id.message_personal_name);
-        mPersonalAge = (TextView) findViewById(R.id.message_personal_age);
-        mPersonalMood = (TextView) findViewById(R.id.message_personal_mood);
-        mIvSex = (ImageView) findViewById(R.id.iv_sex);
-        mIvPersonal = (ImageView) findViewById(R.id.iv_personal);
-
-        mPersonalLine0 = (TextView) findViewById(R.id.tv_line_personal0);
-        mPersonalLine1 = (TextView) findViewById(R.id.tv_line_personal1);
-
-        tv_line_content1 = (TextView) findViewById(R.id.tv_line_content1);
-        tv_line_content2 = (TextView) findViewById(R.id.tv_line_content2);
-
-
-        mAllowBtn.setOnClickListener(this);
-        mRejectBtn.setOnClickListener(this);
-        mBlockBtn.setOnClickListener(this);
-        mBtmOneBtn.setOnClickListener(this);
-
-        mContentLl1.setOnClickListener(this);
-        mContentLl2.setOnClickListener(this);
+        mContentTv = (TextView) findViewById(R.id.item_public_story_tv);
+        mImageView = (ImageView) findViewById(R.id.item_public_story_iv);
+        favCountTv = (TextView) findViewById(R.id.item_public_story_fav_tv);
+        messageCountTv = (TextView) findViewById(R.id.item_public_story_message_tv);
 
     }
 
@@ -134,6 +86,14 @@ public class PublicStoryItem extends LinearLayout implements View.OnClickListene
 
 
     private void bindCommonMessage(final PublicItem msgItem) {
+        mContentTv.setText(msgItem.content);
+        Bitmap bitmap = BaseUtil.getBitmapFromName(mContext, msgItem.userIcon);
+        if (bitmap != null) {
+            mImageView.setImageBitmap(bitmap);
+        }
+
+        favCountTv.setText(msgItem.favCount + "");
+        messageCountTv.setText(msgItem.commentCount + "");
 
         requestLayout();
     }

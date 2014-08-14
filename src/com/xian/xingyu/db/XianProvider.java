@@ -1,4 +1,3 @@
-
 package com.xian.xingyu.db;
 
 import android.content.ContentProvider;
@@ -20,6 +19,7 @@ public class XianProvider extends ContentProvider {
     private static final int PERSONAL_FILTER = 1;
     private static final int EMOTION_FILTER = 2;
     private static final int FILEDATA_FILTER = 3;
+    private static final int PUBLIC_SHOW_FILTER = 4;
 
     private static final UriMatcher sURLMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -29,6 +29,7 @@ public class XianProvider extends ContentProvider {
         sURLMatcher.addURI(DBInfo.AUTHORITY, DBInfo.Personal.TABLE, PERSONAL_FILTER);
         sURLMatcher.addURI(DBInfo.AUTHORITY, DBInfo.Emotion.TABLE, EMOTION_FILTER);
         sURLMatcher.addURI(DBInfo.AUTHORITY, DBInfo.FileData.TABLE, FILEDATA_FILTER);
+        sURLMatcher.addURI(DBInfo.AUTHORITY, DBInfo.PublicShow.TABLE, PUBLIC_SHOW_FILTER);
 
     }
 
@@ -57,6 +58,9 @@ public class XianProvider extends ContentProvider {
                 break;
             case FILEDATA_FILTER:
                 qb.setTables(DBInfo.FileData.TABLE);
+                break;
+            case PUBLIC_SHOW_FILTER:
+                qb.setTables(DBInfo.PublicShow.TABLE);
                 break;
 
             default:
@@ -89,7 +93,9 @@ public class XianProvider extends ContentProvider {
             case FILEDATA_FILTER:
                 tableName = DBInfo.FileData.TABLE;
                 break;
-
+            case PUBLIC_SHOW_FILTER:
+                tableName = DBInfo.PublicShow.TABLE;
+                break;
             default:
                 return null;
         }
@@ -98,8 +104,7 @@ public class XianProvider extends ContentProvider {
             SQLiteDatabase db = mOpenHelper.getWritableDatabase();
             long id = db.insert(tableName, null, values);
             Uri res = Uri.withAppendedPath(uri, String.valueOf(id));
-            if (res != null)
-                notifyChange(res);
+            if (res != null) notifyChange(res);
             return res;
         }
         return null;
@@ -122,7 +127,9 @@ public class XianProvider extends ContentProvider {
             case FILEDATA_FILTER:
                 tableName = DBInfo.FileData.TABLE;
                 break;
-
+            case PUBLIC_SHOW_FILTER:
+                tableName = DBInfo.PublicShow.TABLE;
+                break;
             default:
                 return 0;
         }
@@ -154,7 +161,9 @@ public class XianProvider extends ContentProvider {
             case FILEDATA_FILTER:
                 tableName = DBInfo.FileData.TABLE;
                 break;
-
+            case PUBLIC_SHOW_FILTER:
+                tableName = DBInfo.PublicShow.TABLE;
+                break;
             default:
                 return 0;
         }

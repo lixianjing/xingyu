@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.LinearLayout;
@@ -61,6 +60,7 @@ public class PublicFragment extends Fragment
     private PublicAdapter mPublicAdapter;
     private DBManager mDBManager;
     private BackgroundQueryHandler mBackgroundQueryHandler;
+    private ContentResolver mContentResolver;
 
     public PublicFragment() {
         setRetainInstance(true);
@@ -70,6 +70,11 @@ public class PublicFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // construct the RelativeLayout
         Log.e(TAG, ">>>onCreateView>>>>>>>>>>>>>");
+
+
+        mContentResolver = mActivity.getContentResolver();
+        mBackgroundQueryHandler = new BackgroundQueryHandler(mContentResolver);
+        mBackgroundQueryHandler.setContext(PublicFragment.this);
 
         View view = inflater.inflate(R.layout.fragment_public, null);
 
@@ -81,8 +86,18 @@ public class PublicFragment extends Fragment
                 android.R.color.holo_green_light, android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
+
         mListView = (ListView) view.findViewById(R.id.pub_lv);
 
+        initListView();
+        initListener();
+
+        startMsgListQuery(TYPE_LOAD_FORWARD);
+        return view;
+    }
+
+
+    private void initListView() {
         mListBtmRl =
                 (RelativeLayout) LayoutInflater.from(getActivity()).inflate(
                         R.layout.item_public_bottom, null);
@@ -111,10 +126,9 @@ public class PublicFragment extends Fragment
         mPublicAdapter.setOnDataSetChangedListener(mDataSetChangedListener);
         mListView.setAdapter(mPublicAdapter);
 
-        initListener();
-        startMsgListQuery(TYPE_LOAD_FORWARD);
-        return view;
+
     }
+
 
     private void initListener() {
         mTitleTv.setOnClickListener(this);
@@ -231,7 +245,7 @@ public class PublicFragment extends Fragment
     private void startMsgListQuery(int type) {
 
         mBackgroundQueryHandler.cancelOperation(MESSAGE_LIST_QUERY_TOKEN);
-        mListView.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_NORMAL);
+        // mListView.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_NORMAL);
 
         Uri uri = DBInfo.PublicShow.CONTENT_URI;
 
@@ -269,7 +283,8 @@ public class PublicFragment extends Fragment
                     // FIXME: freshing layout changes the focused view to an
                     // unexpected
                     // one, set it back to TextEditor forcely.
-
+                    if (cursor != null)
+                    Log.e("lmf", ">>>>>>>>>>>" + cursor.getCount());
                     o.mPublicAdapter.changeCursor(cursor);
 
 

@@ -127,11 +127,11 @@ public class XianDataBaseHelper extends SQLiteOpenHelper {
     }
 
     private void initData(SQLiteDatabase db) {
-
+        Log.e("lmf", ">>>>>>>>>>initData>>>>>>>>>>>");
         db.execSQL("INSERT INTO " + DBInfo.Personal.TABLE + "(" + DBInfo.Personal.NAME
                 + ") values('')");
         initTestData(db);
-
+        Log.e("lmf", ">>>>>>>>>>initData>>>>>>>>xxxxxxxxxxxx>>>");
     }
 
     private void initTestData(SQLiteDatabase db) {

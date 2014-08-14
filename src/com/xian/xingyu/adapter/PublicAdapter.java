@@ -25,6 +25,7 @@ import com.xian.xingyu.R;
 import com.xian.xingyu.bean.PublicItem;
 import com.xian.xingyu.db.DBInfo;
 import com.xian.xingyu.view.PublicEmotionItem;
+import com.xian.xingyu.view.PublicStoryItem;
 
 /**
  * The back-end data adapter of a message list.
@@ -73,14 +74,21 @@ public class PublicAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
+        long recordId = cursor.getLong(DBInfo.PublicShow.INDEX_ID);
+        PublicItem msgItem = getCachedMessageItem(recordId, cursor);
         if (view instanceof PublicEmotionItem) {
-            long recordId = cursor.getLong(DBInfo.PublicShow.INDEX_ID);
 
-            PublicItem msgItem = getCachedMessageItem(recordId, cursor);
             if (msgItem != null) {
                 PublicEmotionItem mli = (PublicEmotionItem) view;
-                mli.setAdapter(PublicAdapter.this);
                 mli.bind(mContext, msgItem);
+            }
+        } else if (view instanceof PublicStoryItem) {
+
+            if (msgItem != null) {
+                PublicStoryItem mli = (PublicStoryItem) view;
+
+                mli.bind(mContext, msgItem);
+
             }
         }
     }
