@@ -1,9 +1,9 @@
+
 package com.xian.xingyu.view;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -13,26 +13,18 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 
-import com.xian.xingyu.R;
-import com.xian.xingyu.activity.ImageActivity;
-import com.xian.xingyu.bean.FileDataInfo;
+import com.xian.xingyu.activity.MainActivity;
 import com.xian.xingyu.util.BaseUtil;
 
-import java.util.List;
-
-
 public class ImageScrollView extends HorizontalScrollView implements View.OnClickListener {
-
 
     private static final int IMAGE_SIZE = 150;
 
     private final Context mContext;
 
     private final LinearLayout mLinearLayout;
-    private List<FileDataInfo> mList;
-    private Activity mActivity;
-
-
+    private Handler mainHandler;
+    private String[] mPics;
 
     public ImageScrollView(Context context) {
         this(context, null);
@@ -51,14 +43,13 @@ public class ImageScrollView extends HorizontalScrollView implements View.OnClic
 
     }
 
+    public void loadData(String[] pics, Handler handler) {
+        this.mPics = pics;
+        this.mainHandler = handler;
 
-    public void loadData(List<FileDataInfo> list, Activity activity) {
-        this.mList = list;
-        this.mActivity = activity;
-
-        int listSize = list.size();
+        int listSize = pics.length;
         int childCount = mLinearLayout.getChildCount();
-        Log.e("lmf", ">>>>>>>11111>>>>>>>>>>>" + list.size() + ":" + mLinearLayout.getChildCount());
+        Log.e("lmf", ">>>>>>>11111>>>>>>>>>>>" + pics.length + ":" + mLinearLayout.getChildCount());
         if (childCount > listSize) {
             mLinearLayout.removeViewsInLayout(listSize, childCount - listSize);
         } else if (childCount < listSize) {
@@ -73,16 +64,12 @@ public class ImageScrollView extends HorizontalScrollView implements View.OnClic
 
         }
 
-        Log.e("lmf", ">>>>>>>22222>>>>>>>>>>>" + list.size() + ":" + mLinearLayout.getChildCount());
-
-        for (int i = 0; i < list.size(); i++) {
-            FileDataInfo dataInfo = list.get(i);
+        for (int i = 0; i < pics.length; i++) {
 
             ImageView iv = (ImageView) mLinearLayout.getChildAt(i);
 
-            Bitmap bitmap = BaseUtil.getBitmapFromName(mContext, dataInfo.getThumbUri());
+            Bitmap bitmap = BaseUtil.getBitmapFromName(mContext, pics[i]);
             iv.setImageBitmap(bitmap);
-
 
         }
 
@@ -91,25 +78,8 @@ public class ImageScrollView extends HorizontalScrollView implements View.OnClic
     @Override
     public void onClick(View arg0) {
         // TODO Auto-generated method stub
-        mActivity.startActivity(new Intent(mActivity, ImageActivity.class));
-        mActivity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+
+        mainHandler.sendEmptyMessage(MainActivity.MSG_START_ACTIVITY_IMAGE);
     }
-
-
-
-    // public void addView() {
-    // for (int i = 0; i < list.size(); i++) {
-    // FileDataInfo dataInfo = list.get(i);
-    //
-    // ImageView iv = new ImageView(mContext);
-    // LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100);
-    //
-    // Bitmap bitmap = BaseUtil.getBitmapFromPath(dataInfo.getThumbUri());
-    // iv.setImageBitmap(bitmap);
-    //
-    // holder.imageLl.addView(iv, i, params);
-    //
-    // }
-    // }
 
 }

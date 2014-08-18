@@ -1,10 +1,6 @@
 
 package com.xian.xingyu.adapter;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-
 import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,15 +10,18 @@ import android.widget.TextView;
 
 import com.xian.xingyu.R;
 import com.xian.xingyu.bean.EmotionInfo;
-import com.xian.xingyu.bean.FileDataInfo;
 import com.xian.xingyu.db.DBInfo.Emotion;
 import com.xian.xingyu.view.ImageScrollView;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 
 public class PrivateAdapter extends BaseAdapter {
 
     private static SimpleDateFormat sFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    private Activity mActivity;
+    private final Activity mActivity;
     private LayoutInflater mInflater = null;
     private List<EmotionInfo> mList;
 
@@ -94,14 +93,14 @@ public class PrivateAdapter extends BaseAdapter {
             holder.typeTv.setText("公开");
         }
         holder.imageHsv.setVisibility(View.GONE);
-        if (info.isHasPic()) {
-            List<FileDataInfo> list = info.getFileDateList();
-            if (list != null && list.size() > 0) {
-                holder.imageHsv.setVisibility(View.VISIBLE);
-                holder.imageHsv.loadData(list, mActivity);
-
-            }
-        }
+        // if (info.isHasPic()) {
+        // List<FileDataInfo> list = info.getFileDateList();
+        // if (list != null && list.size() > 0) {
+        // holder.imageHsv.setVisibility(View.VISIBLE);
+        // holder.imageHsv.loadData(list, mActivity);
+        //
+        // }
+        // }
 
         return convertView;
     }

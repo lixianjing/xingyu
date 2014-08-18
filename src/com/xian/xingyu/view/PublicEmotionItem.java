@@ -14,12 +14,11 @@
 
 package com.xian.xingyu.view;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Handler;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -31,16 +30,21 @@ import com.xian.xingyu.R;
 import com.xian.xingyu.bean.PublicItem;
 import com.xian.xingyu.util.BaseUtil;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * This class provides view of a message in the messages list.
  */
-@SuppressLint({"NewApi", "ResourceAsColor"})
+@SuppressLint({
+        "NewApi", "ResourceAsColor"
+})
 public class PublicEmotionItem extends LinearLayout implements View.OnClickListener {
-
 
     private static SimpleDateFormat sFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private Context mContext;
+    private Handler mainHandler;
 
     private PublicItem mMessageItem;
 
@@ -57,8 +61,6 @@ public class PublicEmotionItem extends LinearLayout implements View.OnClickListe
         super(context, attrs);
 
     }
-
-
 
     @Override
     protected void onFinishInflate() {
@@ -83,7 +85,8 @@ public class PublicEmotionItem extends LinearLayout implements View.OnClickListe
     }
 
     public void unbind() {
-        // Clear all references to the message item, which can contain attachments and other
+        // Clear all references to the message item, which can contain
+        // attachments and other
         // memory-intensive objects
     }
 
@@ -91,11 +94,11 @@ public class PublicEmotionItem extends LinearLayout implements View.OnClickListe
         return mMessageItem;
     }
 
-
     private void bindCommonMessage(final PublicItem msgItem) {
 
         Bitmap bitmap = BaseUtil.getBitmapFromName(mContext, msgItem.userIcon);
-        Log.e("lmf", ">>>>>>>>>>" + bitmap + ":" + msgItem.userIcon);
+        Log.e("lmf", ">>>>xxxxxx>>>>>>" + bitmap + ":" + msgItem.userIcon + ":"
+                + (msgItem.hasPic && !TextUtils.isEmpty(msgItem.picUri)));
         if (bitmap != null) {
             iconIv.setImageBitmap(bitmap);
         }
@@ -105,6 +108,18 @@ public class PublicEmotionItem extends LinearLayout implements View.OnClickListe
         Date d1 = new Date(msgItem.stamp);
         String t1 = sFormat.format(d1);
         dateTv.setText(t1);
+
+        imageHsv.setVisibility(View.GONE);
+        if (msgItem.hasPic && !TextUtils.isEmpty(msgItem.picUri)) {
+
+            String[] pic = msgItem.picUri.split(",");
+            if (pic.length > 0) {
+                imageHsv.setVisibility(View.VISIBLE);
+                imageHsv.loadData(pic, mainHandler);
+
+            }
+
+        }
 
         contentTv.setText(msgItem.content);
 
@@ -118,7 +133,5 @@ public class PublicEmotionItem extends LinearLayout implements View.OnClickListe
         // TODO Auto-generated method stub
 
     }
-
-
 
 }

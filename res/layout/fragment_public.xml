@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#CCFFEE"
     android:orientation="vertical" >
 
     <LinearLayout
@@ -24,7 +25,10 @@
         <ListView
             android:id="@+id/pub_lv"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="match_parent"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="2dip"
+            android:padding="10dip" >
         </ListView>
     </android.support.v4.widget.SwipeRefreshLayout>
 
