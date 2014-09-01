@@ -90,6 +90,7 @@ public class PublicFragment extends Fragment
         mListView = (ListView) view.findViewById(R.id.pub_lv);
 
         initListView();
+
         initListener();
 
         startMsgListQuery(TYPE_LOAD_FORWARD);
@@ -252,6 +253,8 @@ public class PublicFragment extends Fragment
         mBackgroundQueryHandler.startQuery(MESSAGE_LIST_QUERY_TOKEN, null, uri,
                 DBInfo.PublicShow.COLUMNS, null, null, DBInfo.PublicShow.STAMP);
 
+
+
     }
 
 
@@ -287,7 +290,7 @@ public class PublicFragment extends Fragment
                     Log.e("lmf", ">>>>>>>>>>>" + cursor.getCount());
                     o.mPublicAdapter.changeCursor(cursor);
 
-
+                    o.mSwipeLayout.setRefreshing(false);
                     break;
 
                 default:

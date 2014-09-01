@@ -1,5 +1,8 @@
 package com.xian.xingyu.activity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -45,9 +48,6 @@ import com.xian.xingyu.view.DrawerView;
 import com.xian.xingyu.view.LoadingDialog;
 import com.xian.xingyu.view.LoginDialog;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class MainActivity extends FragmentActivity implements OnClickListener {
 
     public static final int MSG_LOGIN_SHOW_DIALOG = 1001;
@@ -66,7 +66,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     public static final int MSG_LOGIN_GET_ICON_ERROR = 1011;
 
     public static final int MSG_START_ACTIVITY_EMOTION = 1012;
-    public static final int MSG_START_ACTIVITY_IMAGE = 1013;
 
     private FragmentManager mFragmentManager;
     private Context mContext;
@@ -199,11 +198,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                     Log.e("lmf", ">>>login>>>>>>>>>MSG_LOGIN_GET_ICON_ERROR>>>>>>>");
                     break;
 
-                case MSG_START_ACTIVITY_IMAGE:
-                    startActivity(new Intent(mContext, ImageActivity.class));
-                    overridePendingTransition(R.anim.slide_in_right,
-                            R.anim.slide_out_left);
-                    break;
 
                 default:
                     break;

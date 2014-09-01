@@ -2,8 +2,8 @@
 package com.xian.xingyu.view;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -13,7 +13,7 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 
-import com.xian.xingyu.activity.MainActivity;
+import com.xian.xingyu.activity.ImageActivity;
 import com.xian.xingyu.util.BaseUtil;
 
 public class ImageScrollView extends HorizontalScrollView implements View.OnClickListener {
@@ -23,7 +23,6 @@ public class ImageScrollView extends HorizontalScrollView implements View.OnClic
     private final Context mContext;
 
     private final LinearLayout mLinearLayout;
-    private Handler mainHandler;
     private String[] mPics;
 
     public ImageScrollView(Context context) {
@@ -43,9 +42,8 @@ public class ImageScrollView extends HorizontalScrollView implements View.OnClic
 
     }
 
-    public void loadData(String[] pics, Handler handler) {
+    public void loadData(String[] pics) {
         this.mPics = pics;
-        this.mainHandler = handler;
 
         int listSize = pics.length;
         int childCount = mLinearLayout.getChildCount();
@@ -78,8 +76,11 @@ public class ImageScrollView extends HorizontalScrollView implements View.OnClic
     @Override
     public void onClick(View arg0) {
         // TODO Auto-generated method stub
+        Intent intent = new Intent(mContext, ImageActivity.class);
 
-        mainHandler.sendEmptyMessage(MainActivity.MSG_START_ACTIVITY_IMAGE);
+        intent.putExtra("pics", mPics);
+
+        mContext.startActivity(intent);
     }
 
 }

@@ -14,6 +14,9 @@
 
 package com.xian.xingyu.view;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -29,9 +32,6 @@ import android.widget.TextView;
 import com.xian.xingyu.R;
 import com.xian.xingyu.bean.PublicItem;
 import com.xian.xingyu.util.BaseUtil;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * This class provides view of a message in the messages list.
@@ -95,6 +95,8 @@ public class PublicEmotionItem extends LinearLayout implements View.OnClickListe
     }
 
     private void bindCommonMessage(final PublicItem msgItem) {
+        Log.e("lmf", ">>>>bindCommonMessage>>>>>11111>");
+        long begin = System.currentTimeMillis();
 
         Bitmap bitmap = BaseUtil.getBitmapFromName(mContext, msgItem.userIcon);
         Log.e("lmf", ">>>>xxxxxx>>>>>>" + bitmap + ":" + msgItem.userIcon + ":"
@@ -115,7 +117,7 @@ public class PublicEmotionItem extends LinearLayout implements View.OnClickListe
             String[] pic = msgItem.picUri.split(",");
             if (pic.length > 0) {
                 imageHsv.setVisibility(View.VISIBLE);
-                imageHsv.loadData(pic, mainHandler);
+                imageHsv.loadData(pic);
 
             }
 
@@ -126,6 +128,8 @@ public class PublicEmotionItem extends LinearLayout implements View.OnClickListe
         favCountTv.setText(msgItem.favCount + "");
         messageCountTv.setText(msgItem.commentCount + "");
         requestLayout();
+
+        Log.e("lmf", ">>>>bindCommonMessage>>>>>222>" + (System.currentTimeMillis() - begin));
     }
 
     @Override
