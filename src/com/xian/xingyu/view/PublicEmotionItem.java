@@ -21,6 +21,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -30,6 +31,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.xian.xingyu.R;
+import com.xian.xingyu.activity.MainActivity;
 import com.xian.xingyu.bean.PublicItem;
 import com.xian.xingyu.util.BaseUtil;
 
@@ -51,6 +53,7 @@ public class PublicEmotionItem extends LinearLayout implements View.OnClickListe
     private ImageView iconIv;
     private TextView dateTv, nameTv, contentTv, favCountTv, messageCountTv;
     private ImageScrollView imageHsv;
+    private LinearLayout mainLl;
 
     public PublicEmotionItem(Context context) {
         this(context, null);
@@ -74,6 +77,8 @@ public class PublicEmotionItem extends LinearLayout implements View.OnClickListe
         contentTv = (TextView) findViewById(R.id.item_public_emotion_content_tv);
         favCountTv = (TextView) findViewById(R.id.item_public_emotion_message_tv);
         messageCountTv = (TextView) findViewById(R.id.item_public_emotion_fav_tv);
+
+        mainLl = (LinearLayout) findViewById(R.id.item_public_emotion_main);
 
     }
 
@@ -127,6 +132,9 @@ public class PublicEmotionItem extends LinearLayout implements View.OnClickListe
 
         favCountTv.setText(msgItem.favCount + "");
         messageCountTv.setText(msgItem.commentCount + "");
+
+        mainLl.setOnClickListener(this);
+
         requestLayout();
 
         Log.e("lmf", ">>>>bindCommonMessage>>>>>222>" + (System.currentTimeMillis() - begin));
@@ -136,6 +144,31 @@ public class PublicEmotionItem extends LinearLayout implements View.OnClickListe
     public void onClick(View arg0) {
         // TODO Auto-generated method stub
 
+
+        switch (arg0.getId()) {
+            case R.id.item_public_emotion_main:
+                Log.e("lmf", ">>>>>>>>>>>>xxxxxxxxxxxxx>>>>>>>");
+
+                Message msg=mainHandler.obtainMessage(MainActivity.MSG_START_ACTIVITY_EMOTION);
+                msg.obj=mMessageItem.id;
+                msg.sendToTarget();
+
+                break;
+
+            default:
+                break;
+        }
+
     }
+
+    public Handler getMainHandler() {
+        return mainHandler;
+    }
+
+    public void setMainHandler(Handler mainHandler) {
+        this.mainHandler = mainHandler;
+    }
+
+
 
 }

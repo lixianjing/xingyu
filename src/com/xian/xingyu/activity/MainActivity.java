@@ -66,6 +66,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     public static final int MSG_LOGIN_GET_ICON_ERROR = 1011;
 
     public static final int MSG_START_ACTIVITY_EMOTION = 1012;
+    public static final int MSG_START_ACTIVITY_STORY = 1013;
 
     private FragmentManager mFragmentManager;
     private Context mContext;
@@ -196,6 +197,16 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
                 case MSG_LOGIN_GET_ICON_ERROR:
                     showDialogLoading(false);
                     Log.e("lmf", ">>>login>>>>>>>>>MSG_LOGIN_GET_ICON_ERROR>>>>>>>");
+                    break;
+                case MSG_START_ACTIVITY_EMOTION:
+                    Log.e("lmf", ">>>>>MSG_START_ACTIVITY_EMOTION>>>>>");
+                    startActivity(new Intent(mContext, EmotionActivity.class));
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                    break;
+                case MSG_START_ACTIVITY_STORY:
+                    Log.e("lmf", ">>>>>MSG_START_ACTIVITY_STORY>>>>>");
+                    startActivity(new Intent(mContext, StoryActivity.class));
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                     break;
 
 
@@ -504,5 +515,11 @@ public class MainActivity extends FragmentActivity implements OnClickListener {
     public DrawerView getDrawerView() {
         return drawerView;
     }
+
+    public Handler getHandler() {
+        return mHandler;
+    }
+
+
 
 }

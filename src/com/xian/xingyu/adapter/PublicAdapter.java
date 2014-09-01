@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +42,7 @@ public class PublicAdapter extends CursorAdapter {
     private OnDataSetChangedListener mOnDataSetChangedListener;
 
     private Context mContext;
+    private Handler mainHandler;
 
 
 
@@ -80,13 +82,14 @@ public class PublicAdapter extends CursorAdapter {
 
             if (msgItem != null) {
                 PublicEmotionItem mli = (PublicEmotionItem) view;
+                mli.setMainHandler(mainHandler);
                 mli.bind(mContext, msgItem);
             }
         } else if (view instanceof PublicStoryItem) {
 
             if (msgItem != null) {
                 PublicStoryItem mli = (PublicStoryItem) view;
-
+                mli.setMainHandler(mainHandler);
                 mli.bind(mContext, msgItem);
 
             }
@@ -178,6 +181,14 @@ public class PublicAdapter extends CursorAdapter {
             return false;
         }
         return true;
+    }
+
+    public Handler getMainHandler() {
+        return mainHandler;
+    }
+
+    public void setMainHandler(Handler mainHandler) {
+        this.mainHandler = mainHandler;
     }
 
 

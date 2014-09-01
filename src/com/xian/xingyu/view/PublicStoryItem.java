@@ -17,6 +17,8 @@ package com.xian.xingyu.view;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Handler;
+import android.os.Message;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
@@ -24,6 +26,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.xian.xingyu.R;
+import com.xian.xingyu.activity.MainActivity;
 import com.xian.xingyu.bean.PublicItem;
 import com.xian.xingyu.util.BaseUtil;
 
@@ -35,13 +38,13 @@ public class PublicStoryItem extends LinearLayout implements View.OnClickListene
 
 
     private Context mContext;
+    private Handler mainHandler;
 
     private PublicItem mMessageItem;
 
-
-
     private TextView mContentTv, favCountTv, messageCountTv;
     private ImageView mImageView;
+    private LinearLayout mMainLl;
 
 
 
@@ -65,7 +68,7 @@ public class PublicStoryItem extends LinearLayout implements View.OnClickListene
         mImageView = (ImageView) findViewById(R.id.item_public_story_iv);
         favCountTv = (TextView) findViewById(R.id.item_public_story_fav_tv);
         messageCountTv = (TextView) findViewById(R.id.item_public_story_message_tv);
-
+        mMainLl = (LinearLayout) findViewById(R.id.item_public_story_main);
     }
 
     public void bind(Context context, PublicItem msgItem) {
@@ -94,14 +97,34 @@ public class PublicStoryItem extends LinearLayout implements View.OnClickListene
 
         favCountTv.setText(msgItem.favCount + "");
         messageCountTv.setText(msgItem.commentCount + "");
-
+        mMainLl.setOnClickListener(this);
         requestLayout();
     }
 
     @Override
     public void onClick(View arg0) {
         // TODO Auto-generated method stub
+        switch (arg0.getId()) {
+            case R.id.item_public_story_main:
 
+                Message msg = mainHandler.obtainMessage(MainActivity.MSG_START_ACTIVITY_STORY);
+                msg.obj = mMessageItem.id;
+                msg.sendToTarget();
+
+                break;
+
+            default:
+                break;
+        }
+
+    }
+
+    public Handler getMainHandler() {
+        return mainHandler;
+    }
+
+    public void setMainHandler(Handler mainHandler) {
+        this.mainHandler = mainHandler;
     }
 
 

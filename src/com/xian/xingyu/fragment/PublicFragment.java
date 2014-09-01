@@ -16,8 +16,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -26,7 +24,6 @@ import android.widget.TextView;
 import com.xian.xingyu.MainApp;
 import com.xian.xingyu.R;
 import com.xian.xingyu.activity.AddActivity;
-import com.xian.xingyu.activity.EmotionActivity;
 import com.xian.xingyu.activity.MainActivity;
 import com.xian.xingyu.adapter.PublicAdapter;
 import com.xian.xingyu.db.DBInfo;
@@ -123,7 +120,8 @@ public class PublicFragment extends Fragment
         mListView.addFooterView(mListBtmRl);
 
 
-        mPublicAdapter = new PublicAdapter(getActivity(), null, mListView, true, null);
+        mPublicAdapter = new PublicAdapter(mActivity, null, mListView, true, null);
+        mPublicAdapter.setMainHandler(mActivity.getHandler());
         mPublicAdapter.setOnDataSetChangedListener(mDataSetChangedListener);
         mListView.setAdapter(mPublicAdapter);
 
@@ -134,16 +132,7 @@ public class PublicFragment extends Fragment
     private void initListener() {
         mTitleTv.setOnClickListener(this);
 
-        mListView.setOnItemClickListener(new OnItemClickListener() {
 
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // TODO Auto-generated method stub
-                Log.e("lmf", ">>>>>>>>>>onItemClick>>>>>>>>>");
-                mActivity.startActivity(new Intent(mActivity, EmotionActivity.class));
-                mActivity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-            }
-        });
     }
 
     @Override
@@ -300,5 +289,7 @@ public class PublicFragment extends Fragment
         }
 
     }
+
+
 
 }
