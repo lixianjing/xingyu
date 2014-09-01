@@ -3,7 +3,7 @@ package com.xian.xingyu.view;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -14,7 +14,7 @@ import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 
 import com.xian.xingyu.activity.ImageActivity;
-import com.xian.xingyu.util.BaseUtil;
+import com.xian.xingyu.cache.ImageCacheControler;
 
 public class ImageScrollView extends HorizontalScrollView implements View.OnClickListener {
 
@@ -66,8 +66,10 @@ public class ImageScrollView extends HorizontalScrollView implements View.OnClic
 
             ImageView iv = (ImageView) mLinearLayout.getChildAt(i);
 
-            Bitmap bitmap = BaseUtil.getBitmapFromName(mContext, pics[i]);
-            iv.setImageBitmap(bitmap);
+            Drawable drawable = ImageCacheControler.getInstance().getDrawableCache(mContext,
+                    pics[i]);
+            Log.e("lmf", ">>>>>>drawable>>>" + drawable);
+            iv.setImageDrawable(drawable);
 
         }
 

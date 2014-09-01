@@ -14,12 +14,9 @@
 
 package com.xian.xingyu.view;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
@@ -33,7 +30,10 @@ import android.widget.TextView;
 import com.xian.xingyu.R;
 import com.xian.xingyu.activity.MainActivity;
 import com.xian.xingyu.bean.PublicItem;
-import com.xian.xingyu.util.BaseUtil;
+import com.xian.xingyu.cache.ImageCacheControler;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * This class provides view of a message in the messages list.
@@ -103,11 +103,10 @@ public class PublicEmotionItem extends LinearLayout implements View.OnClickListe
         Log.e("lmf", ">>>>bindCommonMessage>>>>>11111>");
         long begin = System.currentTimeMillis();
 
-        Bitmap bitmap = BaseUtil.getBitmapFromName(mContext, msgItem.userIcon);
-        Log.e("lmf", ">>>>xxxxxx>>>>>>" + bitmap + ":" + msgItem.userIcon + ":"
-                + (msgItem.hasPic && !TextUtils.isEmpty(msgItem.picUri)));
-        if (bitmap != null) {
-            iconIv.setImageBitmap(bitmap);
+        Drawable drawable = ImageCacheControler.getInstance().getDrawableCache(mContext,
+                msgItem.userIcon);
+        if (drawable != null) {
+            iconIv.setImageDrawable(drawable);
         }
 
         nameTv.setText(msgItem.userName);

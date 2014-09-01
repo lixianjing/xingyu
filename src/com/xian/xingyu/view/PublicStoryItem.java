@@ -16,7 +16,7 @@ package com.xian.xingyu.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
@@ -28,14 +28,15 @@ import android.widget.TextView;
 import com.xian.xingyu.R;
 import com.xian.xingyu.activity.MainActivity;
 import com.xian.xingyu.bean.PublicItem;
-import com.xian.xingyu.util.BaseUtil;
+import com.xian.xingyu.cache.ImageCacheControler;
 
 /**
  * This class provides view of a message in the messages list.
  */
-@SuppressLint({"NewApi", "ResourceAsColor"})
+@SuppressLint({
+        "NewApi", "ResourceAsColor"
+})
 public class PublicStoryItem extends LinearLayout implements View.OnClickListener {
-
 
     private Context mContext;
     private Handler mainHandler;
@@ -46,8 +47,6 @@ public class PublicStoryItem extends LinearLayout implements View.OnClickListene
     private ImageView mImageView;
     private LinearLayout mMainLl;
 
-
-
     public PublicStoryItem(Context context) {
         this(context, null);
         // TODO Auto-generated constructor stub
@@ -57,8 +56,6 @@ public class PublicStoryItem extends LinearLayout implements View.OnClickListene
         super(context, attrs);
 
     }
-
-
 
     @Override
     protected void onFinishInflate() {
@@ -79,7 +76,8 @@ public class PublicStoryItem extends LinearLayout implements View.OnClickListene
     }
 
     public void unbind() {
-        // Clear all references to the message item, which can contain attachments and other
+        // Clear all references to the message item, which can contain
+        // attachments and other
         // memory-intensive objects
     }
 
@@ -87,12 +85,12 @@ public class PublicStoryItem extends LinearLayout implements View.OnClickListene
         return mMessageItem;
     }
 
-
     private void bindCommonMessage(final PublicItem msgItem) {
         mContentTv.setText(msgItem.content);
-        Bitmap bitmap = BaseUtil.getBitmapFromName(mContext, msgItem.userIcon);
-        if (bitmap != null) {
-            mImageView.setImageBitmap(bitmap);
+        Drawable drawable = ImageCacheControler.getInstance().getDrawableCache(mContext,
+                msgItem.userIcon);
+        if (drawable != null) {
+            mImageView.setImageDrawable(drawable);
         }
 
         favCountTv.setText(msgItem.favCount + "");
@@ -126,7 +124,5 @@ public class PublicStoryItem extends LinearLayout implements View.OnClickListene
     public void setMainHandler(Handler mainHandler) {
         this.mainHandler = mainHandler;
     }
-
-
 
 }
